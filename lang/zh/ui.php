@@ -1,0 +1,42 @@
+<?php
+
+return [
+    'nav' => ['home' => '首页', 'designs' => '设计', 'styles' => '风格', 'rooms' => '空间', 'dashboard' => '我的工作室', 'admin' => '管理', 'login' => '登录', 'register' => '免费注册', 'logout' => '退出', 'search' => '搜索设计、风格、空间…', 'customize' => '外观设置'],
+    'hero' => ['browse' => '浏览免费设计', 'stats_designs' => '设计', 'stats_designers' => '设计师', 'stats_customers' => '客户'],
+    'home' => [
+        'styles' => '按风格浏览', 'styles_sub' => '从日式北欧到现代韩屋，找到适合你家的氛围。',
+        'trending' => '热门趋势', 'trending_sub' => '本月浏览与解锁最多的设计。',
+        'rooms' => '按空间浏览', 'rooms_sub' => '每个房间，每个角度。',
+        'featured' => '编辑精选', 'featured_sub' => '工作室合作伙伴亲选方案。',
+        'how' => '使用流程',
+        'how1' => '探索', 'how1_d' => '按风格、空间、颜色和预算筛选数百个设计。免费设计即刻查看。',
+        'how2' => '解锁', 'how2_d' => '登录后一次购买高级设计，所有角度与细节永久拥有。',
+        'how3' => '落地', 'how3_d' => '把图库分享给施工方，或作为你自己设计师的需求简报。',
+        'newsletter' => '每月两封，安静的信。', 'newsletter_sub' => '新系列、季节配色与免费设计直达邮箱。', 'newsletter_cta' => '订阅',
+        'viewall' => '查看全部',
+    ],
+    'filters' => ['title' => '筛选', 'style' => '风格', 'room' => '空间', 'price' => '价格', 'all' => '全部', 'free' => '免费', 'paid' => '高级', 'tags' => '热门标签', 'clear' => '清除', 'sort' => '排序', 'results' => '个设计', 'none' => '没有符合条件的设计。'],
+    'sort' => ['trending' => '热门', 'newest' => '最新', 'priceAsc' => '价格从低到高', 'priceDesc' => '价格从高到低', 'popular' => '浏览最多'],
+    'designs' => ['free_title' => '免费设计', 'all_title' => '全部设计'],
+    'design' => [
+        'free' => '免费', 'unlock' => '解锁完整设计', 'owned' => '已解锁', 'signin' => '登录后解锁', 'images' => '张图片',
+        'gallery' => '图库', 'gallery_sub' => '设计师注释，全角度呈现。', 'similar' => '猜你喜欢', 'about' => '关于此设计',
+        'locked' => '解锁后查看', 'free_note' => '此设计免费，尽情浏览每个角度。', 'paid_note' => '一次购买，永久解锁全部高清图片。',
+        'views' => '浏览',
+        'palette' => '配色方案', 'palette_hint' => '此设计使用的主要墙面、木材与点缀色，便于匹配涂料和材料。',
+        'download_all' => '下载全部图片', 'download' => '下载', 'download_hint' => '高清 JPEG 打包为一个 zip 文件。',
+        'like' => '点赞', 'liked' => '已点赞', 'like_hint' => '点赞会影响热门排序。',
+    ],
+    'auth' => [
+        'login' => '欢迎回来', 'login_sub' => '登录以解锁高级设计并查看你的工作室。',
+        'register' => '创建你的工作室', 'register_sub' => '免费账户，收藏设计，解锁高级系列。',
+        'name' => '姓名', 'email' => '邮箱', 'password' => '密码', 'submit_login' => '登录', 'submit_register' => '创建账户',
+        'have' => '已有账户？', 'none' => '新用户？', 'failed' => '邮箱或密码不正确。',
+        'welcome_back' => '欢迎回来，:name。', 'studio_ready' => '你的工作室已就绪。',
+    ],
+    'dash' => ['title' => '我的工作室', 'purchases' => '已解锁设计', 'profile' => '个人资料', 'appearance' => '外观', 'empty' => '你还没有解锁任何设计。', 'saved' => '资料已保存。'],
+    'theme' => ['title' => '自定义外观', 'mode' => '模式', 'light' => '浅色', 'dark' => '深色', 'system' => '跟随系统', 'accent' => '强调色', 'text' => '文字颜色', 'bg' => '背景', 'font' => '标题字体', 'size' => '文字大小', 'radius' => '圆角', 'reset' => '恢复默认'],
+    'checkout' => ['title' => '结算', 'unlock' => '解锁', 'pay' => '支付', 'already_owned' => '你已拥有此设计。', 'declined' => '支付被拒绝（演示）。', 'success_title' => '每个角度都属于你。', 'success_text' => '已加入你的工作室。随时打开完整图库。'],
+    'footer' => ['explore' => '探索', 'company' => '工作室', 'contact' => '联系'],
+    'common' => ['save' => '保存', 'cancel' => '取消', 'back' => '返回'],
+];

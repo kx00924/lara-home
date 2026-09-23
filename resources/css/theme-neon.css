@@ -1,0 +1,176 @@
+@import 'tailwindcss';
+
+@source '../views';
+@source '../js';
+
+/* ------------------------------------------------------------------
+   "Neon" theme: near-black surfaces, cyan borders and glow, Inter +
+   JetBrains Mono. Ported from the myprofile portfolio. Token names
+   used by shared components (ink, canvas, surface, accent, line, muted,
+   faint) are aliased so views the theme does not override still render.
+------------------------------------------------------------------ */
+
+@theme {
+  --color-canvas: #05080c;
+  --color-surface: #0a1017;
+  --color-surface-2: #101a24;
+  --color-panel: #0b1219;
+
+  --color-brand: #22d3ee;
+  --color-brand-bright: #67e8f9;
+  --color-brand-dim: #0e7490;
+  --color-accent: #22d3ee;
+  --color-accent-fg: #05080c;
+  --color-accent-soft: rgb(34 211 238 / 0.08);
+
+  --color-fg: #e6f1f5;
+  --color-ink: #e6f1f5;
+  --color-muted: #93a7b4;
+  --color-ink-muted: #93a7b4;
+  --color-faint: #64798a;
+  --color-ink-faint: #64798a;
+  --color-line: rgb(34 211 238 / 0.25);
+
+  --color-code-kw: #c084fc;
+  --color-code-prop: #7dd3fc;
+  --color-code-str: #a7f3d0;
+  --color-code-bool: #fbbf24;
+
+  --font-sans: 'Inter', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --font-serif: 'Inter', ui-sans-serif, system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
+
+  --radius-card: 14px;
+  --radius-panel: 22px;
+  --radius-xl2: 12px;
+  --radius-xl3: 22px;
+  --radius-pill: 999px;
+
+  --shadow-card-hover: 0 20px 44px -28px rgb(34 211 238 / 0.7);
+  --shadow-glow: 0 10px 30px -14px rgb(34 211 238 / 0.9);
+  --shadow-glow-lg: 0 16px 38px -14px rgb(34 211 238 / 1);
+  --shadow-panel: 0 30px 70px -40px rgb(34 211 238 / 0.85);
+  --shadow-modal: 0 40px 90px -40px rgb(34 211 238 / 0.6);
+  --shadow-soft: 0 10px 30px -14px rgb(34 211 238 / 0.5);
+  --shadow-lift: 0 30px 70px -40px rgb(34 211 238 / 0.85);
+
+  --animate-pulse-ring: pulse-ring 2.2s infinite;
+  --animate-blink: blink 1.1s step-end infinite;
+  --animate-rise: rise 0.55s cubic-bezier(0.4, 0, 0.2, 1) both;
+  --animate-fade: fade 0.35s ease both;
+
+  --container-page: 1180px;
+
+  @keyframes pulse-ring {
+    0% { box-shadow: 0 0 0 0 rgb(34 211 238 / 0.6); }
+    70% { box-shadow: 0 0 0 9px rgb(34 211 238 / 0); }
+    100% { box-shadow: 0 0 0 0 rgb(34 211 238 / 0); }
+  }
+  @keyframes blink { 50% { opacity: 0; } }
+  @keyframes rise {
+    0% { opacity: 0; transform: translateY(26px); }
+    100% { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes fade {
+    0% { opacity: 0; }
+    100% { opacity: 1; }
+  }
+}
+
+@layer base {
+  :root { color-scheme: dark; }
+  html { scroll-behavior: smooth; }
+  body {
+    @apply min-h-screen overflow-x-hidden bg-canvas font-sans text-fg antialiased;
+    line-height: 1.65;
+  }
+  /* Ambient grid, faded out towards the bottom of the viewport. */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    z-index: -2;
+    pointer-events: none;
+    background-image: linear-gradient(rgb(34 211 238 / 0.05) 1px, transparent 1px),
+      linear-gradient(90deg, rgb(34 211 238 / 0.05) 1px, transparent 1px);
+    background-size: 64px 64px;
+    mask-image: radial-gradient(ellipse 100% 70% at 50% 0%, #000 20%, transparent 78%);
+    -webkit-mask-image: radial-gradient(ellipse 100% 70% at 50% 0%, #000 20%, transparent 78%);
+  }
+  /* Two pools of cyan light. */
+  body::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    background: radial-gradient(600px circle at 12% 8%, rgb(34 211 238 / 0.12), transparent 60%),
+      radial-gradient(700px circle at 88% 92%, rgb(14 116 144 / 0.16), transparent 62%);
+  }
+  h1, h2, h3, h4 { @apply font-bold tracking-tight; line-height: 1.15; }
+  ::selection { @apply bg-brand text-canvas; }
+  :focus-visible { @apply outline-2 outline-offset-[3px] outline-brand; border-radius: 4px; }
+  ::-webkit-scrollbar { width: 10px; height: 10px; }
+  ::-webkit-scrollbar-track { @apply bg-canvas; }
+  ::-webkit-scrollbar-thumb { @apply rounded-full border-2 border-canvas bg-brand/25; }
+  ::-webkit-scrollbar-thumb:hover { @apply bg-brand/45; }
+  [x-cloak] { display: none !important; }
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+    *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; }
+  }
+}
+
+@layer components {
+  .shell, .container-page { @apply mx-auto w-full max-w-[1180px] px-6; }
+
+  /* The signature cyan-edged surface. */
+  .card {
+    @apply relative rounded-card border border-brand/25 bg-panel/70 backdrop-blur-md transition duration-300 ease-out hover:-translate-y-1 hover:border-brand/60 hover:shadow-card-hover;
+  }
+  .card-static { @apply relative rounded-card border border-brand/25 bg-panel/70 backdrop-blur-md; }
+
+  .btn { @apply inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-lg border border-brand/25 px-6 py-3 text-[0.92rem] font-semibold transition duration-200 ease-out disabled:cursor-not-allowed disabled:opacity-50; }
+  .btn-primary { @apply inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-lg border border-transparent bg-linear-to-br from-brand-bright to-brand px-6 py-3 text-[0.92rem] font-semibold text-canvas shadow-glow transition duration-200 ease-out hover:-translate-y-0.5 hover:shadow-glow-lg disabled:cursor-not-allowed disabled:opacity-50; }
+  .btn-ghost { @apply inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-lg border border-brand/25 bg-brand/[0.04] px-6 py-3 text-[0.92rem] font-semibold text-fg transition duration-200 ease-out hover:-translate-y-0.5 hover:border-brand/60 hover:bg-brand/[0.06] hover:text-brand-bright disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:translate-y-0; }
+  .btn-soft { @apply inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-lg border border-brand/25 bg-brand/[0.06] px-6 py-3 text-[0.92rem] font-semibold text-brand-bright transition duration-200 ease-out hover:border-brand/60; }
+  .btn-dark { @apply inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-lg bg-fg px-6 py-3 text-[0.92rem] font-semibold text-canvas transition hover:opacity-90; }
+
+  .chip { @apply inline-flex items-center gap-1.5 whitespace-nowrap rounded-full border border-brand/25 bg-brand/[0.06] px-[11px] py-[5px] text-[0.73rem] font-medium text-brand-bright transition hover:border-brand/60; }
+  .chip-active { @apply border-transparent bg-linear-to-br from-brand-bright to-brand text-canvas shadow-glow; }
+  .pill { @apply inline-flex items-center gap-2.5 rounded-full border border-brand/25 bg-brand/[0.03] px-4 py-2.5 text-[0.87rem] font-medium text-muted transition duration-200 hover:border-brand/60 hover:text-fg; }
+  .pill-active { @apply border-transparent bg-linear-to-br from-brand-bright to-brand text-canvas shadow-glow hover:text-canvas; }
+
+  /* Small uppercase label with a leading rule. */
+  .eyebrow { @apply inline-flex items-center gap-2.5 text-xs font-semibold uppercase tracking-[0.22em] text-brand before:h-px before:w-[34px] before:bg-linear-to-r before:from-transparent before:to-brand before:content-['']; }
+  .tag-dot { @apply font-mono text-[0.72rem] text-muted before:mr-1.5 before:inline-block before:size-[5px] before:rounded-full before:align-middle before:bg-brand-dim before:content-['']; }
+  .icon-tile { @apply grid place-items-center rounded-xl border border-brand/25 bg-brand/[0.06] text-brand-bright; }
+
+  .input { @apply w-full rounded-lg border border-brand/25 bg-[#050a0f]/70 px-[15px] py-3 text-[0.93rem] text-fg transition duration-200 placeholder:text-[#4b5c6b] focus:border-brand focus:bg-[#050a0f]/90 focus:outline-none focus:ring-[3px] focus:ring-brand/[0.13]; }
+  .label { @apply mb-2 block text-[0.78rem] font-medium uppercase tracking-wider text-faint; }
+
+  .badge { @apply inline-flex items-center gap-1 rounded-full px-2.5 py-1 font-mono text-[10.5px] font-semibold uppercase tracking-wider; }
+  .badge-free { @apply border border-emerald-400/40 bg-emerald-400/10 text-emerald-300; }
+  .badge-accent { @apply border border-brand/40 bg-brand/10 text-brand-bright; }
+  .badge-glass { @apply border border-brand/25 bg-canvas/70 text-brand-bright backdrop-blur; }
+  .badge-warn { @apply border border-amber-400/40 bg-amber-400/10 text-amber-300; }
+  .badge-danger { @apply border border-red-400/40 bg-red-400/10 text-red-300; }
+  .badge-neutral { @apply border border-brand/15 bg-brand/[0.04] text-muted; }
+
+  .nav-link { @apply rounded-lg px-4 py-2 text-sm font-medium text-muted transition-colors duration-200 hover:bg-brand/5 hover:text-fg; }
+  .nav-link-active { @apply bg-brand/[0.06] text-brand-bright shadow-[inset_0_0_0_1px_rgb(34_211_238/0.25)]; }
+  .table-base { @apply w-full text-sm; }
+  .table-base th { @apply border-b border-brand/25 px-3 py-3 text-left font-mono text-[0.7rem] font-semibold uppercase tracking-wider text-faint; }
+  .table-base td { @apply border-b border-brand/10 px-3 py-3 align-middle; }
+  .prose-soft p { @apply mb-4 leading-relaxed text-muted; }
+
+  /* Masthead used at the top of inner pages. */
+  .page-hero { @apply relative overflow-hidden border-b border-brand/15 pb-14 pt-34 after:absolute after:inset-x-0 after:bottom-[-1px] after:mx-auto after:h-px after:w-[min(760px,88%)] after:bg-linear-to-r after:from-transparent after:via-brand after:to-transparent after:opacity-70 after:content-['']; }
+  .cover-hatch { background-image: radial-gradient(circle at 30% 20%, rgb(34 211 238 / 0.16), transparent 62%), repeating-linear-gradient(135deg, rgb(34 211 238 / 0.05) 0px, rgb(34 211 238 / 0.05) 1px, transparent 1px, transparent 11px); }
+}
+
+@utility scrollbar-none {
+  scrollbar-width: none;
+  &::-webkit-scrollbar { display: none; }
+}
+@utility text-balance { text-wrap: balance; }

@@ -1,0 +1,42 @@
+<?php
+
+return [
+    'nav' => ['home' => '홈', 'designs' => '디자인', 'styles' => '스타일', 'rooms' => '공간', 'dashboard' => '내 스튜디오', 'admin' => '관리자', 'login' => '로그인', 'register' => '무료 가입', 'logout' => '로그아웃', 'search' => '디자인, 스타일, 공간 검색…', 'customize' => '화면 설정'],
+    'hero' => ['browse' => '무료 디자인 보기', 'stats_designs' => '디자인', 'stats_designers' => '디자이너', 'stats_customers' => '고객'],
+    'home' => [
+        'styles' => '스타일별 둘러보기', 'styles_sub' => '재팬디부터 모던 한옥까지, 우리 집에 어울리는 분위기를 찾아보세요.',
+        'trending' => '지금 인기', 'trending_sub' => '이번 달 가장 많이 본 디자인.',
+        'rooms' => '공간별 보기', 'rooms_sub' => '모든 공간을 다양한 각도에서.',
+        'featured' => '에디터 추천', 'featured_sub' => '스튜디오 파트너가 직접 고른 컨셉.',
+        'how' => '이용 방법',
+        'how1' => '탐색', 'how1_d' => '스타일, 공간, 색상, 예산으로 수백 개의 디자인을 필터링하세요. 무료 디자인은 바로 열립니다.',
+        'how2' => '잠금 해제', 'how2_d' => '로그인 후 프리미엄 디자인을 한 번만 구매하면 모든 각도와 디테일을 영구 소장합니다.',
+        'how3' => '시공', 'how3_d' => '갤러리를 시공사와 공유하거나 디자이너 브리프로 활용하세요.',
+        'newsletter' => '한 달에 두 번, 차분한 편지.', 'newsletter_sub' => '새 컬렉션, 시즌 팔레트, 무료 디자인 소식을 받아보세요.', 'newsletter_cta' => '구독하기',
+        'viewall' => '전체 보기',
+    ],
+    'filters' => ['title' => '필터', 'style' => '스타일', 'room' => '공간', 'price' => '가격', 'all' => '전체', 'free' => '무료', 'paid' => '프리미엄', 'tags' => '인기 태그', 'clear' => '초기화', 'sort' => '정렬', 'results' => '개의 디자인', 'none' => '조건에 맞는 디자인이 없습니다.'],
+    'sort' => ['trending' => '인기순', 'newest' => '최신순', 'priceAsc' => '가격 낮은순', 'priceDesc' => '가격 높은순', 'popular' => '조회순'],
+    'designs' => ['free_title' => '무료 디자인', 'all_title' => '전체 디자인'],
+    'design' => [
+        'free' => '무료', 'unlock' => '전체 디자인 잠금 해제', 'owned' => '소장 중', 'signin' => '로그인 후 잠금 해제', 'images' => '장의 이미지',
+        'gallery' => '갤러리', 'gallery_sub' => '디자이너의 노트와 함께 모든 각도를 확인하세요.', 'similar' => '비슷한 디자인', 'about' => '디자인 소개',
+        'locked' => '잠금 해제 후 열람', 'free_note' => '무료 디자인입니다. 모든 각도를 자유롭게 보세요.', 'paid_note' => '1회 구매로 모든 이미지를 고해상도로 영구 소장합니다.',
+        'views' => '조회',
+        'palette' => '컬러 팔레트', 'palette_hint' => '이 디자인에 사용된 주요 벽·목재·포인트 색상입니다. 페인트와 마감재를 맞출 때 참고하세요.',
+        'download_all' => '모든 이미지 다운로드', 'download' => '다운로드', 'download_hint' => '고해상도 JPEG를 zip 파일 하나로 받습니다.',
+        'like' => '좋아요', 'liked' => '좋아요 완료', 'like_hint' => '좋아요는 인기 순위에 반영됩니다.',
+    ],
+    'auth' => [
+        'login' => '다시 오셨군요', 'login_sub' => '로그인하고 프리미엄 디자인을 열어보세요.',
+        'register' => '스튜디오 만들기', 'register_sub' => '무료 계정으로 디자인을 저장하고 프리미엄 컬렉션을 잠금 해제하세요.',
+        'name' => '이름', 'email' => '이메일', 'password' => '비밀번호', 'submit_login' => '로그인', 'submit_register' => '계정 만들기',
+        'have' => '이미 계정이 있으신가요?', 'none' => '처음이신가요?', 'failed' => '이메일 또는 비밀번호가 올바르지 않습니다.',
+        'welcome_back' => ':name님, 다시 오신 것을 환영합니다.', 'studio_ready' => '스튜디오가 준비되었습니다.',
+    ],
+    'dash' => ['title' => '내 스튜디오', 'purchases' => '소장 디자인', 'profile' => '프로필', 'appearance' => '화면 설정', 'empty' => '아직 잠금 해제한 디자인이 없습니다.', 'saved' => '프로필이 저장되었습니다.'],
+    'theme' => ['title' => '화면 설정', 'mode' => '모드', 'light' => '라이트', 'dark' => '다크', 'system' => '시스템', 'accent' => '포인트 색상', 'text' => '글자 색상', 'bg' => '배경', 'font' => '제목 글꼴', 'size' => '글자 크기', 'radius' => '모서리', 'reset' => '기본값으로'],
+    'checkout' => ['title' => '결제', 'unlock' => '잠금 해제', 'pay' => '결제하기', 'already_owned' => '이미 소장 중인 디자인입니다.', 'declined' => '결제가 거절되었습니다 (데모).', 'success_title' => '모든 각도가 당신의 것입니다.', 'success_text' => '디자인이 내 스튜디오에 추가되었습니다. 언제든 전체 갤러리를 열어보세요.'],
+    'footer' => ['explore' => '둘러보기', 'company' => '스튜디오', 'contact' => '문의'],
+    'common' => ['save' => '저장', 'cancel' => '취소', 'back' => '뒤로'],
+];

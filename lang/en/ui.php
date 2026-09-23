@@ -1,0 +1,42 @@
+<?php
+
+return [
+    'nav' => ['home' => 'Home', 'designs' => 'Designs', 'styles' => 'Styles', 'rooms' => 'Rooms', 'dashboard' => 'My Studio', 'admin' => 'Admin', 'login' => 'Sign in', 'register' => 'Join free', 'logout' => 'Sign out', 'search' => 'Search designs, styles, rooms…', 'customize' => 'Customize'],
+    'hero' => ['browse' => 'Browse free designs', 'stats_designs' => 'Designs', 'stats_designers' => 'Designers', 'stats_customers' => 'Happy homes'],
+    'home' => [
+        'styles' => 'Browse by style', 'styles_sub' => 'From Japandi to Modern Hanok, find the mood that fits your home.',
+        'trending' => 'Trending now', 'trending_sub' => 'The most viewed and unlocked designs this month.',
+        'rooms' => 'Shop by room', 'rooms_sub' => 'Every room, in every angle.',
+        'featured' => 'Editor’s picks', 'featured_sub' => 'Hand-selected concepts from our studio partners.',
+        'how' => 'How it works',
+        'how1' => 'Explore', 'how1_d' => 'Filter hundreds of designs by style, room, colour and budget. Free designs open instantly.',
+        'how2' => 'Unlock', 'how2_d' => 'Sign in and unlock a premium design once. Every angle, every detail, forever yours.',
+        'how3' => 'Build', 'how3_d' => 'Share the gallery with your contractor or use it as a brief for your own designer.',
+        'newsletter' => 'A calm letter, twice a month.', 'newsletter_sub' => 'New collections, seasonal palettes and free designs in your inbox.', 'newsletter_cta' => 'Subscribe',
+        'viewall' => 'View all',
+    ],
+    'filters' => ['title' => 'Filters', 'style' => 'Style', 'room' => 'Room', 'price' => 'Price', 'all' => 'All', 'free' => 'Free', 'paid' => 'Premium', 'tags' => 'Popular tags', 'clear' => 'Clear all', 'sort' => 'Sort', 'results' => 'designs', 'none' => 'No designs match these filters.'],
+    'sort' => ['trending' => 'Trending', 'newest' => 'Newest', 'priceAsc' => 'Price: low to high', 'priceDesc' => 'Price: high to low', 'popular' => 'Most viewed'],
+    'designs' => ['free_title' => 'Free designs', 'all_title' => 'All designs'],
+    'design' => [
+        'free' => 'Free', 'unlock' => 'Unlock full design', 'owned' => 'Unlocked', 'signin' => 'Sign in to unlock', 'images' => 'images',
+        'gallery' => 'Gallery', 'gallery_sub' => 'Every angle of this design, with notes from the designer.', 'similar' => 'You may also like', 'about' => 'About this design',
+        'locked' => 'Unlock to view', 'free_note' => 'This design is free. Enjoy every angle.', 'paid_note' => 'One-time purchase. Unlocks all images at full resolution, forever.',
+        'views' => 'views',
+        'palette' => 'Colour palette', 'palette_hint' => 'The main wall, wood and accent tones used in this design, for matching paint and materials.',
+        'download_all' => 'Download all images', 'download' => 'Download', 'download_hint' => 'Full-resolution JPEGs in one zip file.',
+        'like' => 'Like', 'liked' => 'Liked', 'like_hint' => 'Likes help this design rank in Trending.',
+    ],
+    'auth' => [
+        'login' => 'Welcome back', 'login_sub' => 'Sign in to unlock premium designs and see your studio.',
+        'register' => 'Create your studio', 'register_sub' => 'Free account. Save designs, unlock premium collections.',
+        'name' => 'Name', 'email' => 'Email', 'password' => 'Password', 'submit_login' => 'Sign in', 'submit_register' => 'Create account',
+        'have' => 'Already have an account?', 'none' => 'New here?', 'failed' => 'Invalid email or password.',
+        'welcome_back' => 'Welcome back, :name.', 'studio_ready' => 'Your studio is ready.',
+    ],
+    'dash' => ['title' => 'My Studio', 'purchases' => 'Unlocked designs', 'profile' => 'Profile', 'appearance' => 'Appearance', 'empty' => 'You have not unlocked any designs yet.', 'saved' => 'Profile saved.'],
+    'theme' => ['title' => 'Customize your view', 'mode' => 'Mode', 'light' => 'Light', 'dark' => 'Dark', 'system' => 'System', 'accent' => 'Accent colour', 'text' => 'Text colour', 'bg' => 'Background', 'font' => 'Heading font', 'size' => 'Text size', 'radius' => 'Corner radius', 'reset' => 'Reset to site default'],
+    'checkout' => ['title' => 'Checkout', 'unlock' => 'Unlock', 'pay' => 'Pay', 'already_owned' => 'You already own this design.', 'declined' => 'Payment was declined (demo).', 'success_title' => 'Every angle is yours.', 'success_text' => 'is now in your studio. Open the full gallery whenever you like.'],
+    'footer' => ['explore' => 'Explore', 'company' => 'Studio', 'contact' => 'Contact'],
+    'common' => ['save' => 'Save', 'cancel' => 'Cancel', 'back' => 'Back'],
+];

@@ -1,0 +1,118 @@
+@import 'tailwindcss';
+
+@source '../views';
+@source '../js';
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* Runtime-tunable design tokens. The admin panel sets site defaults and the
+   visitor's theme panel overrides them; both write these variables. */
+:root {
+  --c-accent: 255 255 255;
+  --c-accent-fg: 20 18 16;
+  --c-text: 27 26 25;
+  --c-bg: 248 247 245;
+  --c-surface: 255 255 255;
+  --c-surface-2: 238 237 235;
+  --radius: 16px;
+  --font-heading: 'Noto Serif';
+  --font-body: 'Noto Sans';
+  color-scheme: light;
+}
+:root.dark {
+  --c-text: 236 235 232;
+  --c-bg: 17 17 19;
+  --c-surface: 29 29 31;
+  --c-surface-2: 41 41 44;
+  color-scheme: dark;
+}
+
+@theme inline {
+  --color-accent: rgb(var(--c-accent));
+  --color-accent-fg: rgb(var(--c-accent-fg));
+  --color-accent-soft: rgb(var(--c-accent) / 0.12);
+  --color-ink: rgb(var(--c-text));
+  --color-ink-muted: rgb(var(--c-text) / 0.62);
+  --color-ink-faint: rgb(var(--c-text) / 0.42);
+  --color-canvas: rgb(var(--c-bg));
+  --color-surface: rgb(var(--c-surface));
+  --color-surface-2: rgb(var(--c-surface-2));
+  --color-line: rgb(var(--c-text) / 0.1);
+
+  --font-serif: var(--font-heading), 'Noto Serif', 'Noto Serif KR', 'Noto Serif JP', 'Noto Serif SC', Georgia, serif;
+  --font-sans: var(--font-body), 'Noto Sans', 'Noto Sans KR', 'Noto Sans JP', 'Noto Sans SC', system-ui, sans-serif;
+
+  --radius-card: var(--radius);
+  --radius-xl2: var(--radius);
+  --radius-xl3: calc(var(--radius) * 1.5);
+  --radius-pill: 999px;
+
+  --shadow-soft: 0 10px 40px -12px rgb(0 0 0 / 0.14);
+  --shadow-lift: 0 24px 60px -20px rgb(0 0 0 / 0.3);
+
+  --animate-rise: rise 0.6s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+  --animate-fade: fade 0.4s ease both;
+
+  --container-page: 1320px;
+
+  @keyframes rise {
+    0% { opacity: 0; transform: translateY(14px); }
+    100% { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes fade {
+    0% { opacity: 0; }
+    100% { opacity: 1; }
+  }
+}
+
+@layer base {
+  html { scroll-behavior: smooth; }
+  body {
+    background-color: var(--color-canvas);
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+    transition: background-color 0.3s, color 0.3s;
+  }
+  h1, h2, h3, h4 { font-family: var(--font-serif); letter-spacing: -0.01em; }
+  ::selection { background: rgb(var(--c-accent) / 0.3); }
+  [x-cloak] { display: none !important; }
+}
+
+@layer components {
+  .container-page { @apply mx-auto w-full max-w-[1320px] px-4 sm:px-6 lg:px-8; }
+
+  .btn { @apply inline-flex items-center justify-center gap-2 rounded-pill px-5 py-2.5 text-sm font-medium transition-all duration-200 disabled:cursor-not-allowed disabled:opacity-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/50; }
+  .btn-primary { @apply inline-flex items-center justify-center gap-2 rounded-pill px-5 py-2.5 text-sm font-medium transition-all duration-200 bg-accent text-accent-fg hover:brightness-110 hover:shadow-soft active:scale-[0.98] disabled:opacity-50; }
+  .btn-ghost { @apply inline-flex items-center justify-center gap-2 rounded-pill px-5 py-2.5 text-sm font-medium transition-all duration-200 border border-line bg-transparent text-ink hover:bg-surface-2 disabled:opacity-50; }
+  .btn-soft { @apply inline-flex items-center justify-center gap-2 rounded-pill px-5 py-2.5 text-sm font-medium transition-all duration-200 bg-accent-soft text-accent hover:bg-accent/20; }
+  .btn-dark { @apply inline-flex items-center justify-center gap-2 rounded-pill px-5 py-2.5 text-sm font-medium transition-all duration-200 bg-ink text-canvas hover:opacity-90; }
+
+  .input { @apply w-full rounded-xl2 border border-line bg-surface px-4 py-2.5 text-sm text-ink placeholder:text-ink-faint transition focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent/25; }
+  .label { @apply mb-1.5 block text-xs font-medium uppercase tracking-wider text-ink-muted; }
+  .card { @apply rounded-card border border-line bg-surface; }
+  .chip { @apply inline-flex items-center gap-1.5 rounded-pill border border-line bg-surface px-3 py-1.5 text-xs font-medium text-ink-muted transition hover:border-accent/50 hover:text-ink; }
+  .chip-active { @apply border-accent bg-accent-soft text-accent; }
+  .eyebrow { @apply text-xs font-semibold uppercase tracking-[0.2em] text-accent; }
+  .nav-link { @apply rounded-pill px-3 py-2 text-sm font-medium text-ink-muted transition hover:bg-surface-2 hover:text-ink; }
+  .nav-link-active { @apply bg-surface-2 text-ink; }
+  .badge { @apply inline-flex items-center gap-1 rounded-pill px-2.5 py-1 text-[11px] font-semibold uppercase tracking-wider; }
+  .badge-free { @apply bg-emerald-500/15 text-emerald-600 dark:text-emerald-400; }
+  .badge-accent { @apply bg-accent-soft text-accent; }
+  .badge-glass { @apply bg-black/45 text-white backdrop-blur; }
+  .badge-warn { @apply bg-amber-500/15 text-amber-600 dark:text-amber-400; }
+  .badge-danger { @apply bg-red-500/15 text-red-600 dark:text-red-400; }
+  .badge-neutral { @apply bg-surface-2 text-ink-muted; }
+  .table-base { @apply w-full text-sm; }
+  .table-base th { @apply border-b border-line px-3 py-3 text-left text-xs font-semibold uppercase tracking-wider text-ink-muted; }
+  .table-base td { @apply border-b border-line/60 px-3 py-3 align-middle; }
+  .prose-soft p { @apply mb-4 leading-relaxed text-ink-muted; }
+}
+
+@utility scrollbar-none {
+  scrollbar-width: none;
+  &::-webkit-scrollbar { display: none; }
+}
+@utility text-balance {
+  text-wrap: balance;
+}

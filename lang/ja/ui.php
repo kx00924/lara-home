@@ -1,0 +1,42 @@
+<?php
+
+return [
+    'nav' => ['home' => 'ホーム', 'designs' => 'デザイン', 'styles' => 'スタイル', 'rooms' => '部屋', 'dashboard' => 'マイスタジオ', 'admin' => '管理', 'login' => 'ログイン', 'register' => '無料登録', 'logout' => 'ログアウト', 'search' => 'デザイン・スタイル・部屋を検索…', 'customize' => '表示設定'],
+    'hero' => ['browse' => '無料デザインを見る', 'stats_designs' => 'デザイン', 'stats_designers' => 'デザイナー', 'stats_customers' => 'お客様'],
+    'home' => [
+        'styles' => 'スタイルから探す', 'styles_sub' => 'ジャパンディからモダン韓屋まで、あなたの家に合う雰囲気を。',
+        'trending' => 'トレンド', 'trending_sub' => '今月最も見られたデザイン。',
+        'rooms' => '部屋から探す', 'rooms_sub' => 'すべての部屋を、あらゆる角度から。',
+        'featured' => '編集部のおすすめ', 'featured_sub' => 'スタジオパートナーが選んだコンセプト。',
+        'how' => 'ご利用の流れ',
+        'how1' => '探す', 'how1_d' => 'スタイル・部屋・色・予算で絞り込み。無料デザインはすぐに閲覧できます。',
+        'how2' => '購入', 'how2_d' => 'ログインして一度購入すれば、全アングルを永久に閲覧できます。',
+        'how3' => '実現', 'how3_d' => 'ギャラリーを施工会社と共有したり、デザイナーへの依頼書として活用。',
+        'newsletter' => '月2回、静かな便り。', 'newsletter_sub' => '新コレクション、季節のパレット、無料デザインをお届け。', 'newsletter_cta' => '登録する',
+        'viewall' => 'すべて見る',
+    ],
+    'filters' => ['title' => '絞り込み', 'style' => 'スタイル', 'room' => '部屋', 'price' => '価格', 'all' => 'すべて', 'free' => '無料', 'paid' => 'プレミアム', 'tags' => '人気タグ', 'clear' => 'クリア', 'sort' => '並び替え', 'results' => '件のデザイン', 'none' => '条件に合うデザインがありません。'],
+    'sort' => ['trending' => 'トレンド', 'newest' => '新着順', 'priceAsc' => '価格の安い順', 'priceDesc' => '価格の高い順', 'popular' => '閲覧数順'],
+    'designs' => ['free_title' => '無料デザイン', 'all_title' => 'すべてのデザイン'],
+    'design' => [
+        'free' => '無料', 'unlock' => 'デザインを購入', 'owned' => '購入済み', 'signin' => 'ログインして購入', 'images' => '枚',
+        'gallery' => 'ギャラリー', 'gallery_sub' => 'デザイナーのメモとともに全アングルを。', 'similar' => '似たデザイン', 'about' => 'このデザインについて',
+        'locked' => '購入後に閲覧', 'free_note' => '無料デザインです。全アングルをお楽しみください。', 'paid_note' => '一度の購入で全画像を高解像度で永久に。',
+        'views' => '閲覧',
+        'palette' => 'カラーパレット', 'palette_hint' => 'このデザインで使われている主な壁・木材・アクセントの色。塗料や素材を合わせる際の参考に。',
+        'download_all' => 'すべての画像をダウンロード', 'download' => 'ダウンロード', 'download_hint' => '高解像度JPEGを1つのzipで。',
+        'like' => 'いいね', 'liked' => 'いいね済み', 'like_hint' => 'いいねはトレンド順位に反映されます。',
+    ],
+    'auth' => [
+        'login' => 'おかえりなさい', 'login_sub' => 'ログインしてプレミアムデザインを開きましょう。',
+        'register' => 'スタジオを作成', 'register_sub' => '無料アカウントでデザインを保存、プレミアムを購入。',
+        'name' => '名前', 'email' => 'メール', 'password' => 'パスワード', 'submit_login' => 'ログイン', 'submit_register' => 'アカウント作成',
+        'have' => 'アカウントをお持ちですか？', 'none' => 'はじめての方は', 'failed' => 'メールアドレスまたはパスワードが正しくありません。',
+        'welcome_back' => ':nameさん、おかえりなさい。', 'studio_ready' => 'スタジオの準備ができました。',
+    ],
+    'dash' => ['title' => 'マイスタジオ', 'purchases' => '購入済みデザイン', 'profile' => 'プロフィール', 'appearance' => '表示設定', 'empty' => 'まだ購入したデザインはありません。', 'saved' => 'プロフィールを保存しました。'],
+    'theme' => ['title' => '表示をカスタマイズ', 'mode' => 'モード', 'light' => 'ライト', 'dark' => 'ダーク', 'system' => 'システム', 'accent' => 'アクセント色', 'text' => '文字色', 'bg' => '背景', 'font' => '見出しフォント', 'size' => '文字サイズ', 'radius' => '角の丸み', 'reset' => '初期設定に戻す'],
+    'checkout' => ['title' => 'お支払い', 'unlock' => '購入', 'pay' => '支払う', 'already_owned' => 'このデザインはすでに購入済みです。', 'declined' => '決済が拒否されました（デモ）。', 'success_title' => 'すべてのアングルがあなたのものに。', 'success_text' => 'がマイスタジオに追加されました。いつでもギャラリーを開けます。'],
+    'footer' => ['explore' => '探す', 'company' => 'スタジオ', 'contact' => 'お問い合わせ'],
+    'common' => ['save' => '保存', 'cancel' => 'キャンセル', 'back' => '戻る'],
+];
