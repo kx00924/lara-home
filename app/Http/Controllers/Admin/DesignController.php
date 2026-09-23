@@ -51,7 +51,7 @@ class DesignController extends Controller
 
     public function store(Request $request)
     {
-        $design = new Design();
+        $design = new Design;
         $this->save($request, $design);
 
         return redirect()->route('admin.designs.edit', $design)->with('success', 'Design created.');

@@ -35,8 +35,8 @@ return [
         ],
     ],
 
-    "stripe" => [
-        "secret" => env("STRIPE_SECRET"),
+    'stripe' => [
+        'secret' => env('STRIPE_SECRET'),
     ],
 
 ];

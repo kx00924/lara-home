@@ -5,7 +5,7 @@ by style and room, preview free designs without an account, and sign in and pay 
 unlock every angle of a premium design. Admins manage the whole catalogue, orders,
 customers and the look of the site from an admin panel.
 
-Stack: Laravel 13 · Blade · Tailwind CSS 4 · Alpine.js · Vite · SQLite (or MySQL).
+Stack: Laravel 12 · Blade · Tailwind CSS 4 · Alpine.js · Vite · SQLite (or MySQL).
 
 ## Quick start
 
