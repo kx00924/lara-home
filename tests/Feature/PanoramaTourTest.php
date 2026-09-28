@@ -77,6 +77,19 @@ class PanoramaTourTest extends TestCase
             ->assertSee('panoTour(', false);
     }
 
+    public function test_gallery_lists_photos_only_in_both_themes(): void
+    {
+        $design = $this->designWithTour(0);
+
+        foreach (['default', 'neon'] as $theme) {
+            $this->get(route('designs.show', ['design' => $design, 'theme' => $theme]))
+                ->assertOk()
+                ->assertSee('1/1', false)
+                ->assertDontSee('1/3', false)
+                ->assertDontSee('download="two-floor-house-2.jpg"', false);
+        }
+    }
+
     public function test_locked_design_never_renders_panorama_urls(): void
     {
         $design = $this->designWithTour(29);

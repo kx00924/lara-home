@@ -3,13 +3,13 @@
 
 @php
     $cover = $design->cover;
-    // Locked designs reveal only the first photo; panoramas are never revealed until unlocked.
+    // The gallery lists photos only: 360° panoramas live in the tour (and the download zip).
     // Images marked 360° but not shaped like a panorama are treated as normal photos.
-    $firstPhoto = $design->images->values()->search(fn ($img) => ! $img->isViewablePanorama());
-    $gallery = $design->images->values()->map(fn ($img, $i) => [
-        'id' => $img->id, 'kind' => $img->isViewablePanorama() ? 'panorama' : 'photo', 'angle' => $img->isViewablePanorama() ? __('ui.design.badge_360') : ($img->isPanorama() ? 'Photo' : $img->angle),
+    // Locked designs reveal only the first photo.
+    $gallery = $design->images->reject(fn ($img) => $img->isViewablePanorama())->values()->map(fn ($img, $i) => [
+        'id' => $img->id, 'kind' => 'photo', 'angle' => $img->isPanorama() ? 'Photo' : $img->angle,
         'title' => $img->title ?: "{$design->title} · {$img->angle}", 'description' => $img->description,
-        'url' => ($unlocked || $i === $firstPhoto) ? $img->url : null,
+        'url' => ($unlocked || $i === 0) ? $img->url : null,
     ]);
     $tour = $design->tour($unlocked);
     $buyForm = auth()->check() ? route('checkout.start', $design) : null;
@@ -90,7 +90,7 @@
 
     {{-- gallery --}}
     <section id="gallery" class="shell scroll-mt-24 pb-24">
-        <x-section-header :eyebrow="$design->images->count().' '.__('ui.design.images')" :title="__('ui.design.gallery')" :subtitle="__('ui.design.gallery_sub')" />
+        <x-section-header :eyebrow="$gallery->count().' '.__('ui.design.images')" :title="__('ui.design.gallery')" :subtitle="__('ui.design.gallery_sub')" />
         <div class="grid gap-[22px] sm:grid-cols-2 lg:grid-cols-3">
             @foreach($gallery as $i => $img)
                 <article class="card group flex flex-col overflow-hidden">
@@ -103,7 +103,7 @@
                                 <span class="flex flex-col items-center gap-2 text-brand-bright"><span class="grid size-12 place-items-center rounded-full border border-brand/60 bg-brand/[0.06] shadow-[0_0_24px_-8px_#22d3ee]"><x-icon name="lock" size="20" /></span><span class="font-mono text-[0.74rem]">{{ __('ui.design.locked') }}</span></span>
                             @if($buyForm)</button></form>@else</a>@endif
                         @endif
-                        <span class="absolute left-3 top-3 chip {{ $img['kind'] === 'panorama' ? 'chip-active' : '' }}">@if($img['kind'] === 'panorama')<x-icon name="view360" size="11" /> @endif{{ $img['angle'] }}</span>
+                        <span class="absolute left-3 top-3 chip">{{ $img['angle'] }}</span>
                     </div>
                     <div class="flex flex-1 flex-col px-[22px] pb-5 pt-[18px]">
                         <div class="mb-2 flex items-center justify-between gap-3"><h3 class="text-[1.02rem]">{{ $img['title'] }}</h3><span class="shrink-0 font-mono text-[0.72rem] text-faint">{{ $i + 1 }}/{{ $gallery->count() }}</span></div>

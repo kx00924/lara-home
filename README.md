@@ -122,7 +122,8 @@ theme previews and activation, the admin Themes page and the seeder.
   editor's picks, how it works, testimonials, newsletter.
 - Catalogue with filters (style, room, free/premium, tags), search with suggestions,
   sorting and pagination; every filter lives in the URL so it is shareable.
-- Design detail: cover, designer notes, a gallery where every image is its own card with
+- Design detail: cover, designer notes, a photo gallery (360° panoramas appear only in the
+  tour and the zip) where every photo is its own card with
   title, angle and description (e-commerce style), lightbox, like, share, and
   "You may also like" similar designs (same room + style ranked first).
 - **360° tour**: one panorama viewer per floor (drag, pinch or scroll to look around,

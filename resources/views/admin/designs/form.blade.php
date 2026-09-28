@@ -201,8 +201,10 @@
                 <button type="button" @click="closePreview()" class="rounded-full p-2 text-ink-faint hover:bg-surface-2 hover:text-ink" aria-label="Close"><x-icon name="x" size="18" /></button>
             </div>
             <div class="relative aspect-[16/9] overflow-hidden rounded-xl2 bg-black">
-                <canvas x-ref="previewCanvas" tabindex="0" class="h-full w-full cursor-grab touch-none outline-none"></canvas>
+                {{-- A fresh canvas is created on every open: a destroyed viewer's WebGL context cannot be reused. --}}
+                <div x-ref="previewStage" class="absolute inset-0"></div>
                 <div x-show="previewLoading" class="absolute inset-0 grid place-items-center text-sm text-white/80">Loading panorama…</div>
+                <div x-show="previewError" class="absolute inset-0 grid place-items-center p-6 text-center text-sm text-red-300" x-text="previewError"></div>
             </div>
             <div class="mt-4 flex flex-wrap items-center justify-between gap-3">
                 <span class="font-mono text-xs text-ink-muted" x-text="`Direction ${Math.round(previewView.yaw)}° · tilt ${Math.round(previewView.pitch)}° · zoom ${Math.round(previewView.fov)}°`"></span>

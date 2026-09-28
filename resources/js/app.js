@@ -222,7 +222,7 @@ Alpine.data('galleryManager', (initial, angles, uploadUrl, floors = ['Ground flo
     })),
     floors: floors.length ? [...floors] : ['Ground floor'],
     angles, urlInput: '', uploading: false, cover: '',
-    preview: null, previewLoading: false, previewView: { yaw: 0, pitch: 0, fov: 75 },
+    preview: null, previewLoading: false, previewError: '', previewView: { yaw: 0, pitch: 0, fov: 75 },
     // Crop box as fractions (0..1) of the displayed image, so it survives resizing.
     cropAfterUpload: true, cropQueue: [], cropBusy: false,
     crop: { index: null, x: 0, y: 0, w: 1, h: 1, aspect: null, natW: 0, natH: 0, ready: false },
@@ -359,13 +359,19 @@ Alpine.data('galleryManager', (initial, angles, uploadUrl, floors = ['Ground flo
         this.previewView = { yaw: im.pano_yaw, pitch: im.pano_pitch, fov: im.pano_fov };
         await this.$nextTick();
         previewViewer?.destroy();
+        // Each viewer gets its own canvas; destroy() releases the WebGL context, which a canvas cannot get back.
+        const canvas = document.createElement('canvas');
+        canvas.tabIndex = 0;
+        canvas.className = 'block h-full w-full cursor-grab touch-none outline-none';
+        this.$refs.previewStage.replaceChildren(canvas);
+        this.previewError = '';
         this.previewLoading = true;
         try {
-            previewViewer = new PanoramaViewer(this.$refs.previewCanvas, { ...this.previewView, onChange: (v) => { this.previewView = v; } });
+            previewViewer = new PanoramaViewer(canvas, { ...this.previewView, onChange: (v) => { this.previewView = v; } });
             await previewViewer.load(im.url);
             previewViewer.setView(this.previewView);
         } catch (e) {
-            window.dispatchEvent(new CustomEvent('toast', { detail: { message: e.message, type: 'error' } }));
+            this.previewError = `${e.message} The file may have been moved or deleted: ${im.url}`;
         } finally { this.previewLoading = false; }
     },
     useView() {
@@ -373,7 +379,7 @@ Alpine.data('galleryManager', (initial, angles, uploadUrl, floors = ['Ground flo
         if (im) Object.assign(im, { pano_yaw: this.previewView.yaw, pano_pitch: this.previewView.pitch, pano_fov: this.previewView.fov });
         this.closePreview();
     },
-    closePreview() { previewViewer?.destroy(); previewViewer = null; this.preview = null; },
+    closePreview() { previewViewer?.destroy(); previewViewer = null; this.$refs.previewStage?.replaceChildren(); this.preview = null; },
     async upload(files) {
         if (!files?.length) return;
         this.uploading = true;

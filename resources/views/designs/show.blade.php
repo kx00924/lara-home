@@ -3,13 +3,13 @@
 
 @php
     $cover = $design->cover;
-    // Locked designs reveal only the first photo; panoramas are never revealed until unlocked.
+    // The gallery lists photos only: 360° panoramas live in the tour (and the download zip).
     // Images marked 360° but not shaped like a panorama are treated as normal photos.
-    $firstPhoto = $design->images->values()->search(fn ($img) => ! $img->isViewablePanorama());
-    $gallery = $design->images->values()->map(fn ($img, $i) => [
-        'id' => $img->id, 'kind' => $img->isViewablePanorama() ? 'panorama' : 'photo', 'angle' => $img->isViewablePanorama() ? __('ui.design.badge_360') : ($img->isPanorama() ? 'Photo' : $img->angle),
+    // Locked designs reveal only the first photo.
+    $gallery = $design->images->reject(fn ($img) => $img->isViewablePanorama())->values()->map(fn ($img, $i) => [
+        'id' => $img->id, 'kind' => 'photo', 'angle' => $img->isPanorama() ? 'Photo' : $img->angle,
         'title' => $img->title ?: "{$design->title} · {$img->angle}", 'description' => $img->description,
-        'url' => ($unlocked || $i === $firstPhoto) ? $img->url : null,
+        'url' => ($unlocked || $i === 0) ? $img->url : null,
     ]);
     $tour = $design->tour($unlocked);
     $buyForm = auth()->check() ? route('checkout.start', $design) : null;
@@ -91,7 +91,7 @@
     {{-- Gallery: every image as a product-style card --}}
     <section id="gallery" class="container-page mt-16 scroll-mt-24">
         <div class="mb-8">
-            <p class="eyebrow mb-2">{{ $design->images->count() }} {{ __('ui.design.images') }}</p>
+            <p class="eyebrow mb-2">{{ $gallery->count() }} {{ __('ui.design.images') }}</p>
             <h2 class="text-3xl sm:text-4xl">{{ __('ui.design.gallery') }}</h2>
             <p class="mt-2 text-ink-muted">{{ __('ui.design.gallery_sub') }}</p>
         </div>
@@ -110,7 +110,7 @@
                                 </span>
                             @if($buyForm)</button></form>@else</a>@endif
                         @endif
-                        <span class="badge {{ $img['kind'] === 'panorama' ? 'badge-accent' : 'badge-glass' }} absolute left-3 top-3">@if($img['kind'] === 'panorama')<x-icon name="view360" size="11" /> @endif{{ $img['angle'] }}</span>
+                        <span class="badge badge-glass absolute left-3 top-3">{{ $img['angle'] }}</span>
                         <span class="absolute right-3 top-3 rounded-pill bg-black/45 px-2 py-0.5 text-[11px] text-white backdrop-blur">{{ $i + 1 }}/{{ $gallery->count() }}</span>
                     </div>
                     <div class="p-5">
