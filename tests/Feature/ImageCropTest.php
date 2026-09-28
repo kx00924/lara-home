@@ -4,6 +4,7 @@ namespace Tests\Feature;
 
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
 use Tests\TestCase;
 
@@ -47,6 +48,16 @@ class ImageCropTest extends TestCase
         [$w, $h] = getimagesizefromstring(Storage::disk('public')->get($path));
         $this->assertSame([200, 150], [$w, $h]);
         $this->assertFileExists($this->source, 'the original is never overwritten');
+    }
+
+    public function test_admin_stores_an_image_cropped_in_the_browser(): void
+    {
+        $response = $this->actingAs($this->admin())->post(route('admin.images.crop'), [
+            'image' => UploadedFile::fake()->image('crop.jpg', 4096, 2048),
+        ], ['Accept' => 'application/json']);
+
+        $response->assertOk()->assertJsonPath('width', 4096)->assertJsonPath('height', 2048)->assertJsonPath('is_panorama', true);
+        Storage::disk('public')->assertExists(substr($response->json('url'), strlen('/storage/')));
     }
 
     public function test_a_box_larger_than_the_image_is_clamped(): void

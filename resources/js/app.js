@@ -84,7 +84,7 @@ Alpine.data('searchBox', (suggestUrl, listUrl) => ({
         if (!this.q.trim()) { this.items = []; this.open = false; return; }
         this.timer = setTimeout(async () => {
             try {
-                const r = await fetch(`${suggestUrl}?q=${encodeURIComponent(this.q)}`, { headers: { Accept: 'application/json' } });
+                const r = await fetch(`${suggestUrl}?q=${encodeURIComponent(this.q)}`, { headers: { Accept: 'application/json', 'X-Requested-With': 'XMLHttpRequest' } }); // AJAX header keeps this out of Laravel's "previous URL"
                 this.items = await r.json();
                 this.open = this.items.length > 0;
                 this.active = -1;
@@ -185,6 +185,30 @@ Alpine.data('panoTour', (scenes) => {
 /* ---------------- Admin: gallery manager ---------------- */
 const looksLikePanorama = (w, h) => h > 0 && w >= 2000 && Math.abs(w / h - 2) < 0.08;
 
+/**
+ * Crops an image to a pixel box at full resolution and returns it as a Blob:
+ * PNG for PNG sources (keeps transparency), otherwise JPEG. Rejects when the
+ * canvas may not read the image (cross-origin without CORS).
+ */
+function cropToBlob(url, { x, y, width, height }) {
+    return new Promise((resolve, reject) => {
+        const img = new Image();
+        img.crossOrigin = 'anonymous';
+        img.onload = () => {
+            try {
+                const canvas = document.createElement('canvas');
+                canvas.width = width;
+                canvas.height = height;
+                canvas.getContext('2d').drawImage(img, x, y, width, height, 0, 0, width, height);
+                const type = /\.png(\?|$)/i.test(url) ? 'image/png' : 'image/jpeg';
+                canvas.toBlob((blob) => (blob ? resolve(blob) : reject(new Error('Crop failed'))), type, 0.92);
+            } catch (e) { reject(e); }
+        };
+        img.onerror = () => reject(new Error('Image could not be loaded'));
+        img.src = url;
+    });
+}
+
 Alpine.data('galleryManager', (initial, angles, uploadUrl, floors = ['Ground floor'], cropUrl = '') => {
     let previewViewer = null;
     let drag = null; // active crop drag, kept out of reactive state
@@ -202,7 +226,7 @@ Alpine.data('galleryManager', (initial, angles, uploadUrl, floors = ['Ground flo
     // Crop box as fractions (0..1) of the displayed image, so it survives resizing.
     cropAfterUpload: true, cropQueue: [], cropBusy: false,
     crop: { index: null, x: 0, y: 0, w: 1, h: 1, aspect: null, natW: 0, natH: 0, ready: false },
-    cropPresets: [['Free', null], ['1:1', 1], ['4:3', 4 / 3], ['3:2', 3 / 2], ['16:9', 16 / 9]],
+    cropPresets: [['Free', null], ['1:1', 1], ['4:3', 4 / 3], ['3:2', 3 / 2], ['16:9', 16 / 9], ['2:1 · 360°', 2]],
     init() { this.cover = this.$root.dataset.cover || ''; },
 
     /* ---------- crop ---------- */
@@ -216,6 +240,10 @@ Alpine.data('galleryManager', (initial, angles, uploadUrl, floors = ['Ground flo
         this.crop.natH = el.naturalHeight;
         this.crop.ready = true;
         this.setCropAspect(this.crop.aspect);
+    },
+    /** 360° panoramas must stay 2:1 to work in the viewer, so they only get that preset. */
+    cropPresetOptions() {
+        return this.images[this.crop.index]?.kind === 'panorama' ? this.cropPresets.filter(([, a]) => a === 2) : this.cropPresets;
     },
     /** Pixel aspect ratio converted to the fraction space of this image. */
     fracAspect(a) { return a * (this.crop.natH / this.crop.natW); },
@@ -273,12 +301,20 @@ Alpine.data('galleryManager', (initial, angles, uploadUrl, floors = ['Ground flo
         const px = this.cropPixels();
         if (px.x === 0 && px.y === 0 && px.width === this.crop.natW && px.height === this.crop.natH) { this.closeCrop(); return; }
         this.cropBusy = true;
+        const headers = { 'X-CSRF-TOKEN': document.querySelector('meta[name=csrf-token]').content, Accept: 'application/json' };
         try {
-            const r = await fetch(cropUrl, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': document.querySelector('meta[name=csrf-token]').content, Accept: 'application/json' },
-                body: JSON.stringify({ url: im.url, ...px }),
-            });
+            // Crop in the browser and upload the result, so the server needs no image extension.
+            // Images the canvas may not read (external, no CORS) are cropped on the server instead.
+            const blob = await cropToBlob(im.url, px).catch(() => null);
+            let body;
+            if (blob) {
+                body = new FormData();
+                body.append('image', blob, blob.type === 'image/png' ? 'crop.png' : 'crop.jpg');
+            } else {
+                headers['Content-Type'] = 'application/json';
+                body = JSON.stringify({ url: im.url, ...px });
+            }
+            const r = await fetch(cropUrl, { method: 'POST', headers, body });
             const j = await r.json();
             if (!r.ok) throw new Error(j.message || 'Crop failed');
             if (this.cover === im.url) this.cover = j.url;

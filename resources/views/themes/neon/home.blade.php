@@ -42,7 +42,7 @@
                     <span class="size-1 rounded-full bg-brand-dim"></span>
                     <span>{{ $site['statDesigns'] }} {{ __('ui.hero.stats_designs') }}</span>
                 </div>
-                <div class="mt-7 max-w-[540px] animate-rise" style="animation-delay:240ms"><x-search-box large /></div>
+                <div class="relative z-30 mt-7 max-w-[540px] animate-rise" style="animation-delay:240ms"><x-search-box large /></div>
                 <div class="mt-6 flex flex-wrap gap-3.5 animate-rise" style="animation-delay:280ms">
                     <a class="btn-primary" href="{{ route('designs.index') }}">{{ $site['heroCtaText'] }} <x-icon name="arrow-right" size="15" /></a>
                     <a class="btn-ghost" href="{{ route('designs.index', ['price' => 'free']) }}">{{ __('ui.hero.browse') }}</a>

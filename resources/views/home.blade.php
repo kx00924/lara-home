@@ -9,7 +9,7 @@
             <p class="eyebrow mb-4 !text-white/80 animate-rise">{{ $site['tagline'] }}</p>
             <h1 class="max-w-4xl text-balance text-5xl font-medium leading-[1.05] sm:text-7xl animate-rise" style="animation-delay:80ms">{{ $site['heroTitle'] }}</h1>
             <p class="mt-6 max-w-2xl text-balance text-base text-white/80 sm:text-lg animate-rise" style="animation-delay:160ms">{{ $site['heroSubtitle'] }}</p>
-            <div class="mt-8 max-w-2xl animate-rise" style="animation-delay:240ms"><x-search-box large /></div>
+            <div class="relative z-30 mt-8 max-w-2xl animate-rise" style="animation-delay:240ms"><x-search-box large /></div>
             <div class="mt-6 flex flex-wrap gap-3 animate-rise" style="animation-delay:320ms">
                 <a href="{{ route('designs.index') }}" class="btn bg-white text-neutral-900 hover:bg-white/90">{{ $site['heroCtaText'] }} <x-icon name="arrow-right" /></a>
                 <a href="{{ route('designs.index', ['price' => 'free']) }}" class="btn border border-white/40 bg-white/10 text-white backdrop-blur hover:bg-white/20">{{ __('ui.hero.browse') }}</a>

@@ -153,13 +153,11 @@
             </div>
 
             <div class="mb-3 flex flex-wrap items-center gap-2">
-                <template x-if="images[crop.index]?.kind !== 'panorama'">
-                    <div class="flex flex-wrap gap-1.5">
-                        <template x-for="[label, value] in cropPresets" :key="label">
-                            <button type="button" @click="setCropAspect(value)" class="chip" :class="crop.aspect === value ? 'chip-active' : ''" x-text="label"></button>
-                        </template>
-                    </div>
-                </template>
+                <div class="flex flex-wrap gap-1.5">
+                    <template x-for="[label, value] in cropPresetOptions()" :key="label">
+                        <button type="button" @click="setCropAspect(value)" class="chip" :class="crop.aspect === value ? 'chip-active' : ''" x-text="label"></button>
+                    </template>
+                </div>
                 <span x-show="images[crop.index]?.kind === 'panorama'" class="text-xs text-ink-muted">360° panorama: locked to 2:1 so it still works in the viewer.</span>
                 <span class="ml-auto font-mono text-xs text-ink-muted" x-show="crop.ready" x-text="`${cropPixels().width} × ${cropPixels().height} px of ${crop.natW} × ${crop.natH}`"></span>
             </div>

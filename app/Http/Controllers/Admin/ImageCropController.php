@@ -11,20 +11,43 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
 /**
- * Crops a gallery image at full resolution and stores the result as a new
- * file (the original is never overwritten). Returns the new URL and size.
+ * Saves a cropped gallery image as a new file (the original is never
+ * overwritten) and returns its URL and size.
+ *
+ * The browser normally crops the image itself and uploads the result, so no
+ * image extension is needed on the server. Images it cannot read (external
+ * URLs without CORS) are sent as a URL plus a pixel box and cropped here with
+ * GD, when the extension is installed.
  */
 class ImageCropController extends Controller
 {
     public function __invoke(Request $request): JsonResponse
     {
         $data = $request->validate([
-            'url' => ['required', 'string', 'max:1000'],
-            'x' => ['required', 'integer', 'min:0'],
-            'y' => ['required', 'integer', 'min:0'],
-            'width' => ['required', 'integer', 'min:1'],
-            'height' => ['required', 'integer', 'min:1'],
+            'image' => ['required_without:url', 'image', 'max:51200'],
+            'url' => ['required_without:image', 'string', 'max:1000'],
+            'x' => ['required_with:url', 'integer', 'min:0'],
+            'y' => ['required_with:url', 'integer', 'min:0'],
+            'width' => ['required_with:url', 'integer', 'min:1'],
+            'height' => ['required_with:url', 'integer', 'min:1'],
         ]);
+
+        if ($request->hasFile('image')) {
+            $file = $request->file('image');
+            [$width, $height] = @getimagesize($file->getRealPath()) ?: [0, 0];
+
+            return $this->respond($file->store('designs', 'public'), $width, $height);
+        }
+
+        return $this->cropOnServer($data);
+    }
+
+    /**
+     * @param  array{url: string, x: int, y: int, width: int, height: int}  $data
+     */
+    private function cropOnServer(array $data): JsonResponse
+    {
+        abort_unless(function_exists('imagecreatefromstring'), 422, 'This image could not be cropped in the browser, and the server has no GD image extension. Upload the image to this site first, then crop it.');
 
         $bytes = $this->read($data['url']);
         abort_if($bytes === null, 422, 'The image could not be read. Only images on this site or public URLs can be cropped.');
@@ -55,11 +78,16 @@ class ImageCropController extends Controller
         $path = 'designs/'.Str::random(40).($png ? '.png' : '.jpg');
         Storage::disk('public')->put($path, ob_get_clean());
 
+        return $this->respond($path, $w, $h);
+    }
+
+    private function respond(string $path, int $width, int $height): JsonResponse
+    {
         return response()->json([
             'url' => '/storage/'.$path,
-            'width' => $w,
-            'height' => $h,
-            'is_panorama' => UploadController::looksLikePanorama($w, $h),
+            'width' => $width,
+            'height' => $height,
+            'is_panorama' => UploadController::looksLikePanorama($width, $height),
         ]);
     }
 
