@@ -1,10 +1,4 @@
-# Home Studio · home interior design marketplace (Laravel + Blade)
-
-A web service that sells home interior design image collections. Customers browse designs
-by style and room, preview free designs without an account, and sign in and pay once to
-unlock every angle of a premium design, including 360° panorama tours of each floor.
-Admins manage the whole catalogue, orders, customers and the look of the site from an
-admin panel.
+# Home Studio
 
 Stack: Laravel 12 · PHP 8.2+ · Blade · Tailwind CSS 4 · Alpine.js · Vite 6 · SQLite (or MySQL).
 
