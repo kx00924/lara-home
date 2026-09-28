@@ -3,10 +3,15 @@
 
 @php
     $cover = $design->cover;
+    // Locked designs reveal only the first photo; panoramas are never revealed until unlocked.
+    // Images marked 360° but not shaped like a panorama are treated as normal photos.
+    $firstPhoto = $design->images->values()->search(fn ($img) => ! $img->isViewablePanorama());
     $gallery = $design->images->values()->map(fn ($img, $i) => [
-        'id' => $img->id, 'angle' => $img->angle, 'title' => $img->title ?: "{$design->title} · {$img->angle}", 'description' => $img->description,
-        'url' => ($unlocked || $i === 0) ? $img->url : null,
+        'id' => $img->id, 'kind' => $img->isViewablePanorama() ? 'panorama' : 'photo', 'angle' => $img->isViewablePanorama() ? __('ui.design.badge_360') : ($img->isPanorama() ? 'Photo' : $img->angle),
+        'title' => $img->title ?: "{$design->title} · {$img->angle}", 'description' => $img->description,
+        'url' => ($unlocked || $i === $firstPhoto) ? $img->url : null,
     ]);
+    $tour = $design->tour($unlocked);
     $buyForm = auth()->check() ? route('checkout.start', $design) : null;
     $loginUrl = route('login', ['next' => route('designs.show', $design)]);
 @endphp
@@ -81,6 +86,8 @@
         </aside>
     </section>
 
+    <x-panorama-tour :tour="$tour" :design="$design" :unlocked="$unlocked" :cover="$cover" :buy-form="$buyForm" :login-url="$loginUrl" />
+
     {{-- Gallery: every image as a product-style card --}}
     <section id="gallery" class="container-page mt-16 scroll-mt-24">
         <div class="mb-8">
@@ -103,7 +110,7 @@
                                 </span>
                             @if($buyForm)</button></form>@else</a>@endif
                         @endif
-                        <span class="badge badge-glass absolute left-3 top-3">{{ $img['angle'] }}</span>
+                        <span class="badge {{ $img['kind'] === 'panorama' ? 'badge-accent' : 'badge-glass' }} absolute left-3 top-3">@if($img['kind'] === 'panorama')<x-icon name="view360" size="11" /> @endif{{ $img['angle'] }}</span>
                         <span class="absolute right-3 top-3 rounded-pill bg-black/45 px-2 py-0.5 text-[11px] text-white backdrop-blur">{{ $i + 1 }}/{{ $gallery->count() }}</span>
                     </div>
                     <div class="p-5">

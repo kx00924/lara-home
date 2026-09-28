@@ -1,4 +1,5 @@
 import Alpine from 'alpinejs';
+import { PanoramaViewer, webglAvailable } from './panorama';
 
 /* ---------------- Theme (site defaults + visitor overrides) ---------------- */
 const STORAGE_KEY = 'home.theme';
@@ -121,23 +122,222 @@ Alpine.data('designPage', (likeUrl, initialLikes, images, designSlug) => ({
         try { await navigator.clipboard.writeText(window.location.href); window.dispatchEvent(new CustomEvent('toast', { detail: { message: 'Link copied.', type: 'success' } })); }
         catch { window.prompt('Copy this link', window.location.href); }
     },
-    openLightbox(i) { if (this.images[i]?.url) { this.lightbox = i; document.body.style.overflow = 'hidden'; } },
+    // Panoramas open in the 360° tour instead of the flat lightbox.
+    openLightbox(i) {
+        const img = this.images[i];
+        if (!img?.url) return;
+        if (img.kind === 'panorama') { window.dispatchEvent(new CustomEvent('open-panorama', { detail: { id: img.id } })); return; }
+        this.lightbox = i;
+        document.body.style.overflow = 'hidden';
+    },
     closeLightbox() { this.lightbox = -1; document.body.style.overflow = ''; },
-    prev() { this.lightbox = Math.max(0, this.lightbox - 1); },
-    next() { this.lightbox = Math.min(this.images.length - 1, this.lightbox + 1); },
+    isPhoto(j) { return !!this.images[j]?.url && this.images[j].kind !== 'panorama'; },
+    prev() { for (let j = this.lightbox - 1; j >= 0; j--) if (this.isPhoto(j)) { this.lightbox = j; return; } },
+    next() { for (let j = this.lightbox + 1; j < this.images.length; j++) if (this.isPhoto(j)) { this.lightbox = j; return; } },
 }));
 
+/* ---------------- 360° tour: one viewer per floor ---------------- */
+// The viewer lives in a closure, not in Alpine's reactive state: WebGL objects break inside proxies.
+Alpine.data('panoTour', (scenes) => {
+    let viewer = null;
+    return {
+        scenes, active: 0, started: false, loading: false, failed: false, auto: true,
+        init() {
+            const io = new IntersectionObserver((entries) => {
+                if (entries[0].isIntersecting && !this.started) { this.start(0); io.disconnect(); }
+            }, { rootMargin: '200px' });
+            io.observe(this.$el);
+            window.addEventListener('open-panorama', (e) => {
+                const i = this.scenes.findIndex((s) => s.id === e.detail.id);
+                if (i < 0) return;
+                this.$el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                this.started ? this.select(i) : this.start(i);
+            });
+        },
+        start(i) {
+            this.started = true;
+            if (!webglAvailable()) { this.failed = true; return; }
+            try {
+                viewer = new PanoramaViewer(this.$refs.canvas, { autoRotate: this.auto, onInteract: () => { this.auto = false; } });
+            } catch { this.failed = true; return; }
+            this.select(i);
+        },
+        async select(i) {
+            this.active = i;
+            const scene = this.scenes[i];
+            if (!viewer || !scene?.url) return;
+            this.loading = true;
+            try {
+                await viewer.load(scene.url);
+                viewer.setView(scene, false);
+            } catch { this.failed = true; } finally { this.loading = false; }
+        },
+        toggleAuto() { this.auto = !this.auto; if (viewer) viewer.autoRotate = this.auto; },
+        reset() { viewer?.setView(this.scenes[this.active], false); },
+        fullscreen() {
+            if (document.fullscreenElement) document.exitFullscreen();
+            else this.$refs.stage.requestFullscreen?.();
+        },
+        destroy() { viewer?.destroy(); viewer = null; },
+    };
+});
+
 /* ---------------- Admin: gallery manager ---------------- */
-Alpine.data('galleryManager', (initial, angles, uploadUrl) => ({
-    images: initial.map((i) => ({ id: i.id || '', url: i.url, title: i.title || '', description: i.description || '', angle: i.angle || 'Overview' })),
+const looksLikePanorama = (w, h) => h > 0 && w >= 2000 && Math.abs(w / h - 2) < 0.08;
+
+Alpine.data('galleryManager', (initial, angles, uploadUrl, floors = ['Ground floor'], cropUrl = '') => {
+    let previewViewer = null;
+    let drag = null; // active crop drag, kept out of reactive state
+    const clamp01 = (v, lo, hi) => Math.min(hi, Math.max(lo, v));
+    const toast = (message, type = 'info') => window.dispatchEvent(new CustomEvent('toast', { detail: { message, type } }));
+    const blank = (extra) => ({ id: '', title: '', description: '', kind: 'photo', floor: 1, pano_yaw: 0, pano_pitch: 0, pano_fov: 75, w: 0, h: 0, fresh: true, ...extra });
+    return {
+    images: initial.map((i) => ({
+        id: i.id || '', url: i.url, title: i.title || '', description: i.description || '', angle: i.angle || 'Overview',
+        kind: i.kind || 'photo', floor: i.floor || 1, pano_yaw: i.pano_yaw ?? 0, pano_pitch: i.pano_pitch ?? 0, pano_fov: i.pano_fov ?? 75, w: 0, h: 0, fresh: false,
+    })),
+    floors: floors.length ? [...floors] : ['Ground floor'],
     angles, urlInput: '', uploading: false, cover: '',
+    preview: null, previewLoading: false, previewView: { yaw: 0, pitch: 0, fov: 75 },
+    // Crop box as fractions (0..1) of the displayed image, so it survives resizing.
+    cropAfterUpload: true, cropQueue: [], cropBusy: false,
+    crop: { index: null, x: 0, y: 0, w: 1, h: 1, aspect: null, natW: 0, natH: 0, ready: false },
+    cropPresets: [['Free', null], ['1:1', 1], ['4:3', 4 / 3], ['3:2', 3 / 2], ['16:9', 16 / 9]],
     init() { this.cover = this.$root.dataset.cover || ''; },
+
+    /* ---------- crop ---------- */
+    openCrop(i) {
+        const im = this.images[i];
+        if (!im) return;
+        this.crop = { index: i, x: 0, y: 0, w: 1, h: 1, aspect: im.kind === 'panorama' ? 2 : null, natW: 0, natH: 0, ready: false };
+    },
+    cropImageLoaded(el) {
+        this.crop.natW = el.naturalWidth;
+        this.crop.natH = el.naturalHeight;
+        this.crop.ready = true;
+        this.setCropAspect(this.crop.aspect);
+    },
+    /** Pixel aspect ratio converted to the fraction space of this image. */
+    fracAspect(a) { return a * (this.crop.natH / this.crop.natW); },
+    setCropAspect(a) {
+        this.crop.aspect = a;
+        if (!a) { Object.assign(this.crop, { x: 0, y: 0, w: 1, h: 1 }); return; }
+        const af = this.fracAspect(a);
+        let w = 1; let h = w / af;
+        if (h > 1) { h = 1; w = h * af; }
+        Object.assign(this.crop, { w, h, x: (1 - w) / 2, y: (1 - h) / 2 });
+    },
+    cropPixels() {
+        const c = this.crop;
+        return { x: Math.round(c.x * c.natW), y: Math.round(c.y * c.natH), width: Math.max(1, Math.round(c.w * c.natW)), height: Math.max(1, Math.round(c.h * c.natH)) };
+    },
+    startCropDrag(e, mode) {
+        e.preventDefault();
+        const box = this.$refs.cropStage.getBoundingClientRect();
+        drag = { mode, sx: e.clientX, sy: e.clientY, bw: box.width, bh: box.height, r: { x: this.crop.x, y: this.crop.y, w: this.crop.w, h: this.crop.h } };
+        const move = (ev) => this.cropDrag(ev);
+        window.addEventListener('pointermove', move);
+        window.addEventListener('pointerup', () => { window.removeEventListener('pointermove', move); drag = null; }, { once: true });
+    },
+    cropDrag(e) {
+        if (!drag) return;
+        const { mode, r } = drag;
+        const dx = (e.clientX - drag.sx) / drag.bw;
+        const dy = (e.clientY - drag.sy) / drag.bh;
+        const minW = 24 / drag.bw; const minH = 24 / drag.bh;
+        let { x, y, w, h } = r;
+        if (mode === 'move') {
+            x = clamp01(r.x + dx, 0, 1 - r.w);
+            y = clamp01(r.y + dy, 0, 1 - r.h);
+        } else if (this.crop.aspect) {
+            // Aspect-locked: resize from the dragged corner, keeping the opposite corner fixed.
+            const af = this.fracAspect(this.crop.aspect);
+            const west = mode.includes('w'); const north = mode.includes('n');
+            const ax = west ? r.x + r.w : r.x; const ay = north ? r.y + r.h : r.y;
+            const maxW = Math.min(west ? ax : 1 - ax, (north ? ay : 1 - ay) * af);
+            w = clamp01(r.w + (west ? -dx : dx), Math.max(minW, minH * af), maxW);
+            h = w / af;
+            x = west ? ax - w : ax;
+            y = north ? ay - h : ay;
+        } else {
+            if (mode.includes('e')) w = clamp01(r.w + dx, minW, 1 - r.x);
+            if (mode.includes('s')) h = clamp01(r.h + dy, minH, 1 - r.y);
+            if (mode.includes('w')) { x = clamp01(r.x + dx, 0, r.x + r.w - minW); w = r.w + (r.x - x); }
+            if (mode.includes('n')) { y = clamp01(r.y + dy, 0, r.y + r.h - minH); h = r.h + (r.y - y); }
+        }
+        Object.assign(this.crop, { x, y, w, h });
+    },
+    async applyCrop() {
+        const im = this.images[this.crop.index];
+        if (!im || !this.crop.ready) return;
+        const px = this.cropPixels();
+        if (px.x === 0 && px.y === 0 && px.width === this.crop.natW && px.height === this.crop.natH) { this.closeCrop(); return; }
+        this.cropBusy = true;
+        try {
+            const r = await fetch(cropUrl, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': document.querySelector('meta[name=csrf-token]').content, Accept: 'application/json' },
+                body: JSON.stringify({ url: im.url, ...px }),
+            });
+            const j = await r.json();
+            if (!r.ok) throw new Error(j.message || 'Crop failed');
+            if (this.cover === im.url) this.cover = j.url;
+            Object.assign(im, { url: j.url, w: j.width, h: j.height });
+            toast(`Cropped to ${j.width}×${j.height}. Save the design to keep it.`, 'success');
+            this.closeCrop();
+        } catch (e) { toast(e.message, 'error'); } finally { this.cropBusy = false; }
+    },
+    closeCrop() {
+        this.crop.index = null;
+        const next = this.cropQueue.shift();
+        if (next !== undefined) this.$nextTick(() => this.openCrop(next));
+    },
+    skipAllCrops() { this.cropQueue = []; this.crop.index = null; },
     addUrl() {
         const url = this.urlInput.trim();
         if (!url) return;
-        this.images.push({ id: '', url, title: '', description: '', angle: this.angles[this.images.length % this.angles.length] });
+        this.images.push(blank({ url, angle: this.angles[this.images.length % this.angles.length] }));
         this.urlInput = '';
     },
+    /** Called when a thumbnail loads: remember its size and auto-flag fresh 2:1 images as panoramas. */
+    measure(im, el) {
+        im.w = el.naturalWidth;
+        im.h = el.naturalHeight;
+        if (im.fresh && looksLikePanorama(im.w, im.h)) { im.kind = 'panorama'; im.fresh = false; }
+    },
+    isTwoToOne(im) { return im.w > 0 && Math.abs(im.w / im.h - 2) < 0.08; },
+    setKind(im, kind) { im.kind = kind; im.fresh = false; if (kind === 'panorama' && (!im.floor || im.floor > this.floors.length)) im.floor = 1; },
+    addFloor() { this.floors.push(this.floors.length === 1 ? 'Upper floor' : `Floor ${this.floors.length + 1}`); },
+    removeFloor(n) {
+        if (this.floors.length <= 1) return;
+        this.images.forEach((im) => {
+            if (im.kind !== 'panorama') return;
+            if (im.floor === n) im.floor = 1; else if (im.floor > n) im.floor -= 1;
+        });
+        this.floors.splice(n - 1, 1);
+    },
+    panoramaCount(n) { return this.images.filter((im) => im.kind === 'panorama' && Number(im.floor) === n).length; },
+    async openPreview(i) {
+        this.preview = i;
+        const im = this.images[i];
+        this.previewView = { yaw: im.pano_yaw, pitch: im.pano_pitch, fov: im.pano_fov };
+        await this.$nextTick();
+        previewViewer?.destroy();
+        this.previewLoading = true;
+        try {
+            previewViewer = new PanoramaViewer(this.$refs.previewCanvas, { ...this.previewView, onChange: (v) => { this.previewView = v; } });
+            await previewViewer.load(im.url);
+            previewViewer.setView(this.previewView);
+        } catch (e) {
+            window.dispatchEvent(new CustomEvent('toast', { detail: { message: e.message, type: 'error' } }));
+        } finally { this.previewLoading = false; }
+    },
+    useView() {
+        const im = this.images[this.preview];
+        if (im) Object.assign(im, { pano_yaw: this.previewView.yaw, pano_pitch: this.previewView.pitch, pano_fov: this.previewView.fov });
+        this.closePreview();
+    },
+    closePreview() { previewViewer?.destroy(); previewViewer = null; this.preview = null; },
     async upload(files) {
         if (!files?.length) return;
         this.uploading = true;
@@ -147,16 +347,28 @@ Alpine.data('galleryManager', (initial, angles, uploadUrl) => ({
             const r = await fetch(uploadUrl, { method: 'POST', body: fd, headers: { 'X-CSRF-TOKEN': document.querySelector('meta[name=csrf-token]').content, Accept: 'application/json' } });
             if (!r.ok) throw new Error((await r.json()).message || 'Upload failed');
             const j = await r.json();
-            j.files.forEach((f, i) => this.images.push({ id: '', url: f.url, title: f.name.replace(/\.[a-z0-9]+$/i, ''), description: '', angle: this.angles[(this.images.length + i) % this.angles.length] }));
+            const firstNew = this.images.length;
+            j.files.forEach((f, i) => this.images.push(blank({
+                url: f.url, title: f.name.replace(/\.[a-z0-9]+$/i, ''), angle: this.angles[(this.images.length + i) % this.angles.length],
+                kind: f.is_panorama ? 'panorama' : 'photo', w: f.width, h: f.height, fresh: false,
+            })));
+            const panoramas = j.files.filter((f) => f.is_panorama).length;
+            if (panoramas) window.dispatchEvent(new CustomEvent('toast', { detail: { message: `${panoramas} image(s) look like 360° panoramas and were added to the tour.`, type: 'info' } }));
             window.dispatchEvent(new CustomEvent('toast', { detail: { message: `${j.files.length} image(s) uploaded.`, type: 'success' } }));
+            // Offer a crop step for each uploaded photo, one after another.
+            if (this.cropAfterUpload) {
+                const photos = j.files.map((f, i) => (f.is_panorama ? null : firstNew + i)).filter((i) => i !== null);
+                if (photos.length) { this.cropQueue = photos.slice(1); this.openCrop(photos[0]); }
+            }
         } catch (e) {
             window.dispatchEvent(new CustomEvent('toast', { detail: { message: e.message, type: 'error' } }));
         } finally { this.uploading = false; this.$refs.file.value = ''; }
     },
     move(i, dir) { const j = i + dir; if (j < 0 || j >= this.images.length) return; [this.images[i], this.images[j]] = [this.images[j], this.images[i]]; },
     remove(i) { this.images.splice(i, 1); },
-    effectiveCover() { return this.cover || this.images[0]?.url || ''; },
-}));
+    effectiveCover() { return this.cover || this.images.find((im) => im.kind !== 'panorama')?.url || this.images[0]?.url || ''; },
+    };
+});
 
 /* ---------------- Carousel (scroll-snap track with arrows, dots, autoplay) ---------------- */
 Alpine.data('carousel', (autoplayMs = 5000) => ({

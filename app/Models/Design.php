@@ -6,19 +6,21 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 
 class Design extends Model
 {
     protected $fillable = [
         'title', 'slug', 'summary', 'description', 'category_id', 'room_type_id', 'tags', 'colors',
-        'price', 'currency', 'cover_image', 'designer', 'area_sqm', 'featured', 'published',
+        'price', 'currency', 'cover_image', 'designer', 'area_sqm', 'floors', 'featured', 'published',
         'views', 'purchases', 'likes', 'trending_score',
     ];
 
     protected $casts = [
         'tags' => 'array',
         'colors' => 'array',
+        'floors' => 'array',
         'price' => 'float',
         'featured' => 'boolean',
         'published' => 'boolean',
@@ -72,7 +74,62 @@ class Design extends Model
 
     public function getCoverAttribute(): ?string
     {
-        return $this->cover_image ?: $this->images->first()?->url;
+        return $this->cover_image ?: ($this->images->first(fn (DesignImage $i) => ! $i->isViewablePanorama()) ?? $this->images->first())?->url;
+    }
+
+    /**
+     * Floor names in order; floor number N is index N - 1.
+     *
+     * @return array<int, string>
+     */
+    public function floorNames(): array
+    {
+        $names = array_values(array_filter(array_map('trim', $this->floors ?? []), fn (string $n) => $n !== ''));
+
+        return $names ?: ['Ground floor'];
+    }
+
+    /**
+     * Images marked as 360° that are not 2:1, and are therefore left out of the tour.
+     *
+     * @return Collection<int, DesignImage>
+     */
+    public function misshapenPanoramas()
+    {
+        return $this->images->filter(fn (DesignImage $i) => $i->isPanorama() && ! $i->isViewablePanorama())->values();
+    }
+
+    /**
+     * The 360° tour: one entry per floor that has panoramas, each with its scenes.
+     * Only images that are genuinely 2:1 are included.
+     * Scene URLs are only included when the visitor may see the full design.
+     *
+     * @return array<int, array{floor: int, name: string, scenes: array<int, array{id: int, title: string, description: ?string, url: ?string, yaw: float, pitch: float, fov: float}>}>
+     */
+    public function tour(bool $unlocked): array
+    {
+        $names = $this->floorNames();
+
+        return $this->images
+            ->filter(fn (DesignImage $i) => $i->isViewablePanorama())
+            ->groupBy(fn (DesignImage $i) => max(1, (int) $i->floor))
+            ->sortKeys()
+            ->map(fn ($scenes, int $floor) => [
+                'floor' => $floor,
+                'name' => $names[$floor - 1] ?? 'Floor '.$floor,
+                'scenes' => $scenes->sortBy('sort_order')->values()->map(fn (DesignImage $s, int $n) => [
+                    'id' => $s->id,
+                    // Bare numbers read like floor numbers, so they become "Room 1", "Room 2".
+                    'title' => ctype_digit(trim((string) $s->title)) ? 'Room '.trim($s->title) : (trim((string) $s->title) ?: 'Room '.($n + 1)),
+                    'description' => $s->description,
+                    'url' => $unlocked ? $s->url : null,
+                    'yaw' => $s->pano_yaw,
+                    'pitch' => $s->pano_pitch,
+                    'fov' => $s->pano_fov,
+                ])->all(),
+            ])
+            ->values()
+            ->all();
     }
 
     public function computeTrending(): int

@@ -66,4 +66,5 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(fun
     Route::get('/settings', [Admin\SettingController::class, 'edit'])->name('settings.edit');
     Route::put('/settings', [Admin\SettingController::class, 'update'])->name('settings.update');
     Route::post('/upload', Admin\UploadController::class)->name('upload');
+    Route::post('/images/crop', Admin\ImageCropController::class)->name('images.crop');
 });

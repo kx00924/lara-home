@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Category;
 use App\Models\Design;
 use App\Models\RoomType;
+use App\Support\LocalImage;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
@@ -96,34 +97,73 @@ class DesignController extends Controller
         $zip = new ZipArchive;
         abort_unless($zip->open($tmp, ZipArchive::OVERWRITE) === true, 500, 'Could not create the zip file.');
 
-        $added = 0;
-        foreach ($design->images as $i => $image) {
-            $contents = $this->imageContents($image->url);
-            if ($contents === null) {
+        // Layout: Photos/…, then one folder per floor under "360 panoramas/".
+        $floorNames = $design->floorNames();
+        $counters = [];
+        $contents = [];
+        foreach ($design->images as $image) {
+            $bytes = $this->imageContents($image->url);
+            if ($bytes === null) {
                 continue;
             }
-            $name = sprintf('%02d-%s.jpg', $i + 1, Str::slug($image->angle ?: 'image'));
-            $zip->addFromString($name, $contents);
-            $added++;
+            if ($image->isViewablePanorama()) {
+                $floor = max(1, (int) $image->floor);
+                $folder = '360 panoramas/'.$this->folderName("Floor {$floor} - ".($floorNames[$floor - 1] ?? "Floor {$floor}"));
+                $label = $image->title ?: 'panorama';
+            } else {
+                $folder = 'Photos';
+                $label = $image->title ?: ($image->angle ?: 'image');
+            }
+            $counters[$folder] = ($counters[$folder] ?? 0) + 1;
+            $name = sprintf('%s/%02d-%s.%s', $folder, $counters[$folder], Str::slug(Str::limit($label, 60, '')) ?: 'image', $this->extension($image->url));
+            $zip->addFromString($name, $bytes);
+            $contents[$folder][] = basename($name);
         }
-        $zip->addFromString('README.txt', "{$design->title}\n{$design->summary}\n\nDownloaded from ".setting('siteName')."\n");
+        abort_if($counters === [], 404, 'No image files were available for this design.');
+
+        $readme = "{$design->title}\n{$design->summary}\n\n";
+        foreach ($contents as $folder => $files) {
+            $readme .= "{$folder}/ (".count($files).")\n  ".implode("\n  ", $files)."\n\n";
+        }
+        if (collect(array_keys($counters))->contains(fn (string $folder) => str_starts_with($folder, '360 panoramas'))) {
+            $readme .= "360 panoramas are equirectangular images: open them in any 360 photo viewer.\n\n";
+        }
+        $zip->addFromString('README.txt', $readme.'Downloaded from '.setting('siteName')."\n");
         $zip->close();
-        abort_if($added === 0, 404, 'No image files were available for this design.');
 
         return response()->download($tmp, $design->slug.'-images.zip', ['Content-Type' => 'application/zip'])->deleteFileAfterSend(true);
     }
 
-    /** Raw bytes for a gallery image, whether it lives in public/, storage/ or on a remote host. */
+    /**
+     * Raw bytes for a gallery image. Files on this server are read from disk
+     * (never fetched over HTTP, which would deadlock a single-threaded dev
+     * server); only genuinely external URLs are downloaded.
+     */
     private function imageContents(string $url): ?string
     {
-        if (preg_match('#^https?://#i', $url)) {
+        if ($path = LocalImage::path($url)) {
+            return file_get_contents($path);
+        }
+        if (preg_match('#^https?://#i', $url) && ! LocalImage::isOwnHost($url)) {
             $response = Http::timeout(30)->get($url);
 
             return $response->successful() ? $response->body() : null;
         }
-        $path = public_path(ltrim(parse_url($url, PHP_URL_PATH) ?: $url, '/'));
 
-        return is_file($path) ? file_get_contents($path) : null;
+        return null;
+    }
+
+    private function extension(string $url): string
+    {
+        $ext = strtolower(pathinfo((string) parse_url($url, PHP_URL_PATH), PATHINFO_EXTENSION));
+
+        return in_array($ext, ['jpg', 'jpeg', 'png', 'webp', 'gif', 'avif'], true) ? $ext : 'jpg';
+    }
+
+    /** A folder name that is safe on Windows, macOS and Linux. */
+    private function folderName(string $name): string
+    {
+        return trim(preg_replace('/[^\pL\pN ._-]+/u', ' ', $name) ?? 'Floor', ' .') ?: 'Floor';
     }
 
     public function like(Design $design)

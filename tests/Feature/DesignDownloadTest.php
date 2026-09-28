@@ -9,6 +9,7 @@ use App\Models\Order;
 use App\Models\RoomType;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Http;
 use Tests\TestCase;
 use ZipArchive;
 
@@ -67,7 +68,39 @@ class DesignDownloadTest extends TestCase
         $zip = new ZipArchive;
         $this->assertTrue($zip->open($response->getFile()->getPathname()));
         $this->assertSame(3, $zip->numFiles); // two images + README
-        $this->assertNotFalse($zip->locateName('01-overview.jpg'));
+        $this->assertNotFalse($zip->locateName('Photos/01-overview.jpg'));
+        $this->assertNotFalse($zip->locateName('Photos/02-detail.jpg'));
+        $zip->close();
+    }
+
+    public function test_panoramas_are_zipped_into_one_folder_per_floor(): void
+    {
+        $design = $this->makeDesign(0);
+        $design->update(['floors' => ['Ground floor', 'Upper floor']]);
+        foreach ([[1, 'Lounge'], [1, 'Kitchen'], [2, 'Bedroom']] as $i => [$floor, $title]) {
+            DesignImage::create(['design_id' => $design->id, 'url' => '/images/library/phpunit-sample.jpg', 'kind' => 'panorama', 'floor' => $floor, 'title' => $title, 'sort_order' => 10 + $i]);
+        }
+
+        $zip = new ZipArchive;
+        $this->assertTrue($zip->open($this->get(route('designs.download', $design))->assertOk()->getFile()->getPathname()));
+        $this->assertNotFalse($zip->locateName('Photos/01-overview.jpg'));
+        $this->assertNotFalse($zip->locateName('360 panoramas/Floor 1 - Ground floor/01-lounge.jpg'));
+        $this->assertNotFalse($zip->locateName('360 panoramas/Floor 1 - Ground floor/02-kitchen.jpg'));
+        $this->assertNotFalse($zip->locateName('360 panoramas/Floor 2 - Upper floor/01-bedroom.jpg'));
+        $this->assertSame(6, $zip->numFiles); // 2 photos + 3 panoramas + README
+        $zip->close();
+    }
+
+    public function test_uploads_stored_with_this_sites_absolute_url_are_read_from_disk(): void
+    {
+        // An absolute URL on our own host must never be fetched over HTTP (it deadlocks a single-threaded server).
+        Http::preventStrayRequests();
+        $design = $this->makeDesign(0);
+        $design->images()->update(['url' => 'http://localhost:8000/images/library/phpunit-sample.jpg']);
+
+        $zip = new ZipArchive;
+        $this->assertTrue($zip->open($this->get(route('designs.download', $design))->assertOk()->getFile()->getPathname()));
+        $this->assertSame(3, $zip->numFiles);
         $zip->close();
     }
 
