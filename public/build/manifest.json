@@ -1,0 +1,18 @@
+{
+  "resources/css/app.css": {
+    "file": "assets/app-tc3K0u3z.css",
+    "src": "resources/css/app.css",
+    "isEntry": true
+  },
+  "resources/css/theme-neon.css": {
+    "file": "assets/theme-neon-B_HV_jf1.css",
+    "src": "resources/css/theme-neon.css",
+    "isEntry": true
+  },
+  "resources/js/app.js": {
+    "file": "assets/app-BiGPjVKk.js",
+    "name": "app",
+    "src": "resources/js/app.js",
+    "isEntry": true
+  }
+}
