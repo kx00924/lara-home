@@ -7,7 +7,8 @@
 @endphp
 
 @section('content')
-<div x-data="{ editing: null, form: @js($empty), open(item) { this.editing = item ? item.id : 'new'; this.form = item ? { ...item } : @js($empty); } }" @keydown.escape.window="editing = null">
+{{-- `editing` holds the slug of the item being edited (routes bind by slug), or 'new'. --}}
+<div x-data="{ editing: null, form: @js($empty), open(item) { this.editing = item ? item.slug : 'new'; this.form = item ? { ...item } : @js($empty); } }" @keydown.escape.window="editing = null">
     <p class="mb-5 text-sm text-ink-muted">{{ $label['hint'] }}</p>
     <div class="mb-5 flex flex-wrap items-center gap-3">
         <form method="GET" class="flex min-w-[240px] flex-1 items-center gap-2 rounded-pill border border-line bg-surface px-4 py-2 sm:max-w-sm"><x-icon name="search" size="15" class="text-ink-faint" /><input name="q" value="{{ $q }}" placeholder="Search {{ strtolower($label['many']) }}…" class="w-full bg-transparent text-sm outline-none"></form>
@@ -32,7 +33,7 @@
                         </td>
                         <td>
                             <div class="flex items-center justify-end gap-3">
-                                <button @click="open(@js($item->only('id', 'name', 'description', 'image', 'icon', 'sort_order', 'is_active')))" class="text-ink-faint hover:text-ink" aria-label="Edit"><x-icon name="pencil" size="15" /></button>
+                                <button @click="open(@js($item->only('slug', 'name', 'description', 'image', 'icon', 'sort_order', 'is_active')))" class="text-ink-faint hover:text-ink" aria-label="Edit"><x-icon name="pencil" size="15" /></button>
                                 <form method="POST" action="{{ route($base.'.destroy', $item) }}" x-data="{ arm: false }" @submit.prevent="arm ? $el.submit() : (arm = true, setTimeout(() => arm = false, 3000))">@csrf @method('DELETE')<button class="text-sm" :class="arm ? 'font-semibold text-red-600' : 'text-red-500 hover:underline'" x-text="arm ? 'Confirm delete' : 'Delete'"></button></form>
                             </div>
                         </td>
@@ -46,7 +47,7 @@
 
     {{-- Modal --}}
     <div x-cloak x-show="editing" x-transition.opacity class="fixed inset-0 z-[90] flex items-end justify-center bg-black/50 p-0 backdrop-blur-sm sm:items-center sm:p-6" @click.self="editing = null">
-        <form :action="editing === 'new' ? @js(route($base.'.store')) : @js(url('admin/'.$kind)) + '/' + editing" method="POST" class="max-h-[92vh] w-full overflow-y-auto rounded-t-xl3 bg-surface p-6 shadow-lift sm:max-w-lg sm:rounded-xl3">
+        <form :action="editing === 'new' ? @js(route($base.'.store')) : @js(url('admin/'.$kind)) + '/' + encodeURIComponent(editing)" method="POST" class="max-h-[92vh] w-full overflow-y-auto rounded-t-xl3 bg-surface p-6 shadow-lift sm:max-w-lg sm:rounded-xl3">
             @csrf
             <template x-if="editing !== 'new'"><input type="hidden" name="_method" value="PUT"></template>
             <div class="mb-4 flex items-center justify-between"><h3 class="text-xl" x-text="editing === 'new' ? 'New {{ $label['one'] }}' : 'Edit {{ $label['one'] }}'"></h3><button type="button" @click="editing = null" class="rounded-full p-2 text-ink-faint hover:bg-surface-2 hover:text-ink"><x-icon name="x" size="18" /></button></div>
