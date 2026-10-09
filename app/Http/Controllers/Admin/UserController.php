@@ -2,22 +2,26 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Http\Controllers\Admin\Concerns\ListsRecords;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use Illuminate\Http\Request;
 
 class UserController extends Controller
 {
+    use ListsRecords;
+
     public function index(Request $request)
     {
+        $list = $this->listOptions($request, ['name', 'email', 'role', 'purchases_count', 'spent', 'created_at', 'is_active'], 'created_at', 'desc');
         $users = User::withCount(['orders as purchases_count' => fn ($q) => $q->where('status', 'paid')])
             ->withSum(['orders as spent' => fn ($q) => $q->where('status', 'paid')], 'amount')
             ->when($request->query('q'), fn ($q, $s) => $q->where(fn ($w) => $w->where('name', 'like', "%$s%")->orWhere('email', 'like', "%$s%")))
-            ->latest()
-            ->paginate(25)
+            ->orderBy($list['sort'], $list['dir'])->orderByDesc('id')
+            ->paginate($list['perPage'])
             ->withQueryString();
 
-        return view('admin.users', ['users' => $users, 'q' => $request->query('q')]);
+        return view('admin.users', ['users' => $users, 'q' => $request->query('q')] + $list);
     }
 
     public function update(Request $request, User $user)
@@ -27,14 +31,14 @@ class UserController extends Controller
             'is_active' => ['nullable', 'boolean'],
         ]);
         if ($user->id === $request->user()->id) {
-            return back()->with('error', 'You cannot change your own role or status.');
+            return back()->with('error', __('messages.admin.own_account_change'));
         }
         $user->update(array_filter([
             'role' => $data['role'] ?? null,
             'is_active' => $request->has('is_active') ? $request->boolean('is_active') : null,
         ], fn ($v) => $v !== null));
 
-        return back()->with('success', 'Customer updated.');
+        return back()->with('success', __('messages.admin.customer_updated'));
     }
 
     /** Applies one action to many accounts at once; the signed-in admin is always skipped. */
@@ -56,18 +60,18 @@ class UserController extends Controller
             };
         }
         $skipped = count($data['ids']) - $users->count();
-        $message = "{$users->count()} account(s) ".['activate' => 'activated', 'deactivate' => 'deactivated', 'make_customer' => 'set to customer', 'make_admin' => 'set to admin', 'delete' => 'deleted'][$data['action']].'.';
+        $message = __('messages.admin.bulk_done', ['count' => $users->count(), 'items' => __('messages.admin.nouns.accounts'), 'action' => __('messages.admin.actions.'.$data['action'])]);
 
-        return back()->with($skipped ? 'warning' : 'success', $message.($skipped ? ' Your own account was skipped.' : ''));
+        return back()->with($skipped ? 'warning' : 'success', $message.($skipped ? __('messages.admin.bulk_self_skipped') : ''));
     }
 
     public function destroy(Request $request, User $user)
     {
         if ($user->id === $request->user()->id) {
-            return back()->with('error', 'You cannot delete yourself.');
+            return back()->with('error', __('messages.admin.own_account_delete'));
         }
         $user->delete();
 
-        return back()->with('success', 'Customer deleted.');
+        return back()->with('success', __('messages.admin.customer_deleted'));
     }
 }

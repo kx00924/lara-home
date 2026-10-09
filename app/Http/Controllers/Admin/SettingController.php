@@ -61,6 +61,6 @@ class SettingController extends Controller
         $data['currency'] = strtoupper(($data['currency'] ?? null) ?: 'USD');
         Setting::put($data);
 
-        return redirect()->route('admin.settings.edit', ['tab' => $request->input('tab', 'branding')])->with('success', 'Settings saved. The site updates immediately.');
+        return redirect()->route('admin.settings.edit', ['tab' => $request->input('tab', 'branding')])->with('success', __('messages.admin.settings_saved'));
     }
 }

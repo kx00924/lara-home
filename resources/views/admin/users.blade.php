@@ -5,13 +5,20 @@
 <div x-data="bulkTable()">
     <div class="mb-5 flex flex-wrap items-center gap-3">
         <form method="GET" class="flex min-w-[240px] flex-1 items-center gap-2 rounded-pill border border-line bg-surface px-4 py-2 sm:max-w-sm"><x-icon name="search" size="15" class="text-ink-faint" /><input name="q" value="{{ $q }}" placeholder="Search name or email…" class="w-full bg-transparent text-sm outline-none"></form>
-        <span class="ml-auto text-sm text-ink-muted">{{ $users->total() }} accounts</span>
+        <div class="ml-auto"><x-admin.per-page :paginator="$users" /></div>
     </div>
     <div class="card overflow-x-auto">
         <table class="table-base">
             <thead><tr>
                 <th class="w-8"><input type="checkbox" :checked="allSelected" @change="toggleAll($event.target.checked)" class="accent-accent" aria-label="Select all"></th>
-                <th class="w-12">No.</th><th>Customer</th><th>Role</th><th>Purchases</th><th>Spent</th><th>Joined</th><th>Active</th><th></th>
+                <th class="w-12">No.</th>
+                <x-admin.sort-th key="name" label="Customer" :sort="$sort" :dir="$dir" />
+                <x-admin.sort-th key="role" label="Role" :sort="$sort" :dir="$dir" />
+                <x-admin.sort-th key="purchases_count" label="Purchases" :sort="$sort" :dir="$dir" />
+                <x-admin.sort-th key="spent" label="Spent" :sort="$sort" :dir="$dir" />
+                <x-admin.sort-th key="created_at" label="Joined" :sort="$sort" :dir="$dir" />
+                <x-admin.sort-th key="is_active" label="Active" :sort="$sort" :dir="$dir" />
+                <th></th>
             </tr></thead>
             <tbody>
                 @forelse($users as $u)
@@ -35,7 +42,7 @@
                         </td>
                         <td class="text-right">
                             @unless($me)
-                                <form method="POST" action="{{ route('admin.users.destroy', $u) }}" x-data="{ arm: false }" @submit.prevent="arm ? $el.submit() : (arm = true, setTimeout(() => arm = false, 3000))">@csrf @method('DELETE')<button class="text-sm" :class="arm ? 'font-semibold text-red-600' : 'text-red-500 hover:underline'" x-text="arm ? 'Confirm delete' : 'Delete'"></button></form>
+                                <x-delete-form :action="route('admin.users.destroy', $u)" :item="'the account of '.$u->name" message="Their orders stay on record, but they can no longer sign in. This cannot be undone." />
                             @endunless
                         </td>
                     </tr>

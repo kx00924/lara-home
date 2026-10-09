@@ -490,6 +490,13 @@ window.confirmToggle = async (input, label = 'this item') => {
     input.checked = next;
     input.form.requestSubmit();
 };
+// Delete buttons in tables: confirm in the dialog, then send the row's delete form.
+window.confirmDelete = async (form, item = 'this item', message = 'This cannot be undone.') => {
+    const ok = await window.confirmDialog({ title: `Delete ${item}?`, message, okLabel: 'Delete', danger: true });
+    if (!ok) return;
+    Alpine.store('loader').show();
+    form.submit();
+};
 // Status / role selects: remember the previous value on focus, confirm the change, revert on cancel.
 window.confirmSelect = async (select, label = 'this item') => {
     const prev = select.dataset.prev ?? '';
@@ -501,9 +508,15 @@ window.confirmSelect = async (select, label = 'this item') => {
 
 /* ---------------- Page loader: shown while the next page loads ---------------- */
 Alpine.store('loader', {
-    visible: false, timer: null,
-    show() { clearTimeout(this.timer); this.timer = setTimeout(() => { this.visible = true; }, 150); },
-    hide() { clearTimeout(this.timer); this.visible = false; },
+    visible: false, timer: null, failsafe: null,
+    show() {
+        clearTimeout(this.timer);
+        this.timer = setTimeout(() => { this.visible = true; }, 150);
+        // A file download or a blocked navigation never fires pageshow, so never stay up for good.
+        clearTimeout(this.failsafe);
+        this.failsafe = setTimeout(() => this.hide(), 10000);
+    },
+    hide() { clearTimeout(this.timer); clearTimeout(this.failsafe); this.visible = false; },
 });
 document.addEventListener('click', (e) => {
     const a = e.target.closest('a[href]');
@@ -511,6 +524,7 @@ document.addEventListener('click', (e) => {
     if ((a.target && a.target !== '_self') || a.hasAttribute('download') || a.dataset.noLoader !== undefined) return;
     const url = new URL(a.href, location.href);
     if (url.origin !== location.origin || !/^https?:$/.test(url.protocol)) return;
+    if (/\/download$/.test(url.pathname) || /\.(zip|pdf|jpe?g|png|webp|csv)$/i.test(url.pathname)) return; // files, not pages
     if (url.pathname === location.pathname && url.search === location.search && url.hash) return;
     Alpine.store('loader').show();
 });
@@ -544,6 +558,42 @@ Alpine.data('bulkTable', () => ({
         Alpine.store('loader').show();
         form.submit();
     },
+}));
+
+/* ---------------- Date picker: a popover calendar backing a hidden input (no library) ---------------- */
+const pad2 = (n) => String(n).padStart(2, '0');
+const ymd = (d) => `${d.getFullYear()}-${pad2(d.getMonth() + 1)}-${pad2(d.getDate())}`;
+const MONTHS = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+Alpine.data('datepicker', (initial = '', max = '', min = '') => ({
+    value: initial || '', open: false, max, min, viewYear: 0, viewMonth: 0,
+    months: MONTHS, weekdays: ['Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa', 'Su'],
+    init() { this.showMonthOf(this.value || ymd(new Date())); },
+    showMonthOf(iso) { const [y, m] = iso.split('-').map(Number); this.viewYear = y; this.viewMonth = m - 1; },
+    get title() { return `${MONTHS[this.viewMonth]} ${this.viewYear}`; },
+    get label() {
+        if (!this.value) return '';
+        const [y, m, d] = this.value.split('-').map(Number);
+        return `${MONTHS[m - 1].slice(0, 3)} ${d}, ${y}`;
+    },
+    /** Six rows of seven days, Monday first, including the trailing/leading days of the neighbouring months. */
+    get days() {
+        const first = new Date(this.viewYear, this.viewMonth, 1);
+        const offset = (first.getDay() + 6) % 7;
+        const today = ymd(new Date());
+        return Array.from({ length: 42 }, (_, i) => {
+            const d = new Date(this.viewYear, this.viewMonth, i - offset + 1);
+            const iso = ymd(d);
+            // A real boolean: Alpine renders `:disabled=""` (an empty string) as disabled.
+            const disabled = Boolean((this.max && iso > this.max) || (this.min && iso < this.min));
+            return { iso, day: d.getDate(), inMonth: d.getMonth() === this.viewMonth, today: iso === today, selected: iso === this.value, disabled };
+        });
+    },
+    toggle() { this.open = !this.open; if (this.open) this.showMonthOf(this.value || ymd(new Date())); },
+    prev() { if (--this.viewMonth < 0) { this.viewMonth = 11; this.viewYear--; } },
+    next() { if (++this.viewMonth > 11) { this.viewMonth = 0; this.viewYear++; } },
+    pick(day) { if (day.disabled) return; this.value = day.iso; this.open = false; },
+    today() { const t = ymd(new Date()); if (!(this.max && t > this.max)) { this.value = t; this.showMonthOf(t); } this.open = false; },
+    clear() { this.value = ''; this.open = false; },
 }));
 
 /* ---------------- Single-image upload field (admin forms) ---------------- */

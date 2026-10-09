@@ -2,46 +2,51 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Http\Controllers\Admin\Concerns\ListsRecords;
 use App\Http\Controllers\Controller;
 use App\Models\RoomType;
 use Illuminate\Http\Request;
 
 class RoomTypeController extends Controller
 {
+    use ListsRecords;
+
     public function index(Request $request)
     {
-        $items = RoomType::withCount('designs')->when($request->query('q'), fn ($q, $s) => $q->where('name', 'like', "%$s%"))->orderBy('sort_order')->orderBy('name')->paginate(20)->withQueryString();
+        $list = $this->listOptions($request, ['name', 'sort_order', 'designs_count', 'is_active', 'created_at'], 'sort_order');
+        $items = RoomType::withCount('designs')->when($request->query('q'), fn ($q, $s) => $q->where('name', 'like', "%$s%"))
+            ->orderBy($list['sort'], $list['dir'])->orderBy('name')->paginate($list['perPage'])->withQueryString();
 
         return view('admin.taxonomy', [
             'kind' => 'room-types',
             'items' => $items,
             'label' => ['one' => 'room type', 'many' => 'Room types', 'hint' => 'Rooms such as Living Room or Kitchen. Every design belongs to one room type.'],
             'q' => $request->query('q'),
-        ]);
+        ] + $list);
     }
 
     public function store(Request $request)
     {
         RoomType::create($this->validated($request));
 
-        return back()->with('success', 'Room type created.');
+        return back()->with('success', __('messages.admin.room_created'));
     }
 
     public function update(Request $request, RoomType $roomType)
     {
         $roomType->update($this->validated($request, $roomType->id));
 
-        return back()->with('success', 'Room type saved.');
+        return back()->with('success', __('messages.admin.room_saved'));
     }
 
     public function destroy(RoomType $roomType)
     {
         if ($roomType->designs()->exists()) {
-            return back()->with('error', 'This room type still has designs. Move them first.');
+            return back()->with('error', __('messages.admin.room_has_designs'));
         }
         $roomType->delete();
 
-        return back()->with('success', 'Room type deleted.');
+        return back()->with('success', __('messages.admin.room_deleted'));
     }
 
     /** Applies one action to many room type(s) at once (activate, deactivate, delete). */
@@ -62,9 +67,9 @@ class RoomTypeController extends Controller
             };
         }
         $done = $items->count() - $skipped;
-        $message = "{$done} room type(s) ".['activate' => 'activated', 'deactivate' => 'deactivated', 'delete' => 'deleted'][$data['action']].'.';
+        $message = __('messages.admin.bulk_done', ['count' => $done, 'items' => __('messages.admin.nouns.rooms'), 'action' => __('messages.admin.actions.'.$data['action'])]);
 
-        return back()->with($skipped ? 'warning' : 'success', $message.($skipped ? " {$skipped} still have designs and were kept." : ''));
+        return back()->with($skipped ? 'warning' : 'success', $message.($skipped ? __('messages.admin.bulk_taxonomy_kept', ['count' => $skipped]) : ''));
     }
 
     private function validated(Request $request, ?int $id = null): array

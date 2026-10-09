@@ -147,8 +147,9 @@ theme previews and activation, the admin Themes page and the seeder.
 **Admin panel** (`/admin`)
 - Dashboard: revenue chart, orders, new customers, views, catalogue mix, top designs and
   recent orders, filtered by period (last 7 / 30 days, this week / month / year, or a
-  custom date range; long ranges chart by month).
-- Every table has search, pagination, numbering and row checkboxes with a bulk-action
+  custom date range picked with a built-in calendar; long ranges chart by month).
+- Every table has search, sortable columns (click a header), a page-size selector
+  (10 / 20 / 50 / 100), pagination, numbering and row checkboxes with a bulk-action
   bar (publish / unpublish / feature / delete designs, activate / deactivate / delete
   styles and rooms, change order status, change customer role / status / delete).
 - Active, published, status and role changes ask for confirmation first; thumbnails open
@@ -188,6 +189,7 @@ resources/css           app.css (Calm) and theme-neon.css, Tailwind 4 themes dri
 resources/js/app.js     Alpine: theme store, search box, design page, 360° tour, gallery manager + cropper, toasts
 resources/js/panorama.js     Dependency-free WebGL equirectangular panorama viewer
 lang/{en,zh}/ui.php     UI strings
+lang/{en,zh}/messages.php   Every notification sent from PHP (flash messages, error texts); edit wording here
 ```
 
 ## Routes

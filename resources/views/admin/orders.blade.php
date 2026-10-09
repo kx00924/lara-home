@@ -14,14 +14,20 @@
                 <a href="{{ route('admin.orders.index', array_filter(['status' => $s, 'q' => $q])) }}" class="rounded-pill px-3 py-1.5 text-xs font-medium capitalize {{ $status === $s ? 'bg-surface shadow-soft' : 'text-ink-muted' }}">{{ $s ?: 'All' }}</a>
             @endforeach
         </div>
-        <span class="ml-auto text-sm text-ink-muted">{{ $orders->total() }} orders</span>
+        <div class="ml-auto"><x-admin.per-page :paginator="$orders" /></div>
     </div>
     <div class="card overflow-x-auto">
         @if($orders->count())
             <table class="table-base">
                 <thead><tr>
                     <th class="w-8"><input type="checkbox" :checked="allSelected" @change="toggleAll($event.target.checked)" class="accent-accent" aria-label="Select all"></th>
-                    <th class="w-12">No.</th><th>Order</th><th>Customer</th><th>Design</th><th>Amount</th><th>Provider</th><th>Status</th><th>Date</th>
+                    <th class="w-12">No.</th>
+                    <x-admin.sort-th key="id" label="Order" :sort="$sort" :dir="$dir" />
+                    <th>Customer</th><th>Design</th>
+                    <x-admin.sort-th key="amount" label="Amount" :sort="$sort" :dir="$dir" />
+                    <x-admin.sort-th key="provider" label="Provider" :sort="$sort" :dir="$dir" />
+                    <x-admin.sort-th key="status" label="Status" :sort="$sort" :dir="$dir" />
+                    <x-admin.sort-th key="created_at" label="Date" :sort="$sort" :dir="$dir" />
                 </tr></thead>
                 <tbody>
                     @foreach($orders as $o)

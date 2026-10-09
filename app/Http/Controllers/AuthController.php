@@ -23,7 +23,7 @@ class AuthController extends Controller
         if (! $request->user()->is_active) {
             Auth::logout();
 
-            return back()->withErrors(['email' => 'This account has been deactivated.']);
+            return back()->withErrors(['email' => __('messages.auth.deactivated')]);
         }
         $request->session()->regenerate();
         $next = $request->input('next');

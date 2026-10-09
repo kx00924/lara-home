@@ -47,13 +47,13 @@ class ImageCropController extends Controller
      */
     private function cropOnServer(array $data): JsonResponse
     {
-        abort_unless(function_exists('imagecreatefromstring'), 422, 'This image could not be cropped in the browser, and the server has no GD image extension. Upload the image to this site first, then crop it.');
+        abort_unless(function_exists('imagecreatefromstring'), 422, __('messages.crop.no_gd'));
 
         $bytes = $this->read($data['url']);
-        abort_if($bytes === null, 422, 'The image could not be read. Only images on this site or public URLs can be cropped.');
+        abort_if($bytes === null, 422, __('messages.crop.unreadable'));
         $info = @getimagesizefromstring($bytes);
         $source = $info ? @imagecreatefromstring($bytes) : false;
-        abort_unless($source, 422, 'This file is not an image that can be cropped.');
+        abort_unless($source, 422, __('messages.crop.not_an_image'));
 
         // Clamp the box to the image so an over-sized selection still produces a valid crop.
         [$width, $height] = [imagesx($source), imagesy($source)];
@@ -64,7 +64,7 @@ class ImageCropController extends Controller
 
         $cropped = imagecrop($source, ['x' => $x, 'y' => $y, 'width' => $w, 'height' => $h]);
         imagedestroy($source);
-        abort_unless($cropped, 500, 'The image could not be cropped.');
+        abort_unless($cropped, 500, __('messages.crop.failed'));
 
         $png = ($info['mime'] ?? '') === 'image/png';
         ob_start();

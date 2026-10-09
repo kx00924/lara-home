@@ -13,7 +13,7 @@
     <p class="mb-5 text-sm text-ink-muted">{{ $label['hint'] }}</p>
     <div class="mb-5 flex flex-wrap items-center gap-3">
         <form method="GET" class="flex min-w-[240px] flex-1 items-center gap-2 rounded-pill border border-line bg-surface px-4 py-2 sm:max-w-sm"><x-icon name="search" size="15" class="text-ink-faint" /><input name="q" value="{{ $q }}" placeholder="Search {{ strtolower($label['many']) }}…" class="w-full bg-transparent text-sm outline-none"></form>
-        <span class="text-sm text-ink-muted">{{ $items->total() }} {{ strtolower($label['many']) }}</span>
+        <x-admin.per-page :paginator="$items" />
         <button @click="open(null)" class="btn-primary ml-auto"><x-icon name="plus" size="15" /> New {{ $label['one'] }}</button>
     </div>
 
@@ -21,7 +21,13 @@
         <table class="table-base">
             <thead><tr>
                 <th class="w-8"><input type="checkbox" :checked="allSelected" @change="toggleAll($event.target.checked)" class="accent-accent" aria-label="Select all"></th>
-                <th class="w-12">No.</th><th>Name</th><th>Description</th><th>Designs</th><th>Order</th><th>Active</th><th></th>
+                <th class="w-12">No.</th>
+                <x-admin.sort-th key="name" label="Name" :sort="$sort" :dir="$dir" />
+                <th>Description</th>
+                <x-admin.sort-th key="designs_count" label="Designs" :sort="$sort" :dir="$dir" />
+                <x-admin.sort-th key="sort_order" label="Order" :sort="$sort" :dir="$dir" />
+                <x-admin.sort-th key="is_active" label="Active" :sort="$sort" :dir="$dir" />
+                <th></th>
             </tr></thead>
             <tbody>
                 @forelse($items as $item)
@@ -44,7 +50,7 @@
                         <td>
                             <div class="flex items-center justify-end gap-3">
                                 <button @click="open(@js($item->only('slug', 'name', 'description', 'image', 'icon', 'sort_order', 'is_active')))" class="text-ink-faint hover:text-ink" aria-label="Edit"><x-icon name="pencil" size="15" /></button>
-                                <form method="POST" action="{{ route($base.'.destroy', $item) }}" x-data="{ arm: false }" @submit.prevent="arm ? $el.submit() : (arm = true, setTimeout(() => arm = false, 3000))">@csrf @method('DELETE')<button class="text-sm" :class="arm ? 'font-semibold text-red-600' : 'text-red-500 hover:underline'" x-text="arm ? 'Confirm delete' : 'Delete'"></button></form>
+                                <x-delete-form :action="route($base.'.destroy', $item)" :item="'“'.$item->name.'”'" :message="$item->designs_count ? 'It still has '.$item->designs_count.' design(s), so the server will refuse until they are moved.' : 'This cannot be undone.'" />
                             </div>
                         </td>
                     </tr>

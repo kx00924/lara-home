@@ -15,7 +15,7 @@ Route::get('/designs/suggest', [DesignController::class, 'suggest'])->name('desi
 Route::get('/designs/{design:slug}', [DesignController::class, 'show'])->name('designs.show');
 Route::get('/designs/{design:slug}/download', [DesignController::class, 'download'])->name('designs.download');
 Route::post('/designs/{design:slug}/like', [DesignController::class, 'like'])->name('designs.like');
-Route::post('/newsletter', fn () => back()->with('success', 'Thank you. You are on the list.'))->name('newsletter');
+Route::post('/newsletter', fn () => back()->with('success', __('messages.newsletter.subscribed')))->name('newsletter');
 
 Route::get('/theme/{theme}', function (string $theme) {
     abort_unless($theme === 'site' || in_array($theme, available_themes(), true), 404);

@@ -92,17 +92,17 @@ class DesignController extends Controller
     public function download(Request $request, Design $design): BinaryFileResponse
     {
         abort_unless($design->published || $request->user()?->isAdmin(), 404);
-        abort_unless($design->unlockedFor($request->user()), 403, 'Unlock this design to download its images.');
+        abort_unless($design->unlockedFor($request->user()), 403, __('messages.download.locked'));
 
-        abort_unless(class_exists(ZipArchive::class), 500, 'Downloads need the PHP "zip" extension, which is not installed on this server.');
+        abort_unless(class_exists(ZipArchive::class), 500, __('messages.download.no_zip_extension'));
         $design->load('images');
         // Build the zip inside storage/: the system temp dir is often unwritable on shared hosting.
         $tmpDir = storage_path('app/tmp');
         File::ensureDirectoryExists($tmpDir);
         $tmp = tempnam($tmpDir, 'design-') ?: tempnam(sys_get_temp_dir(), 'design-');
-        abort_unless($tmp, 500, 'Could not create a temporary file for the zip.');
+        abort_unless($tmp, 500, __('messages.download.no_temp_file'));
         $zip = new ZipArchive;
-        abort_unless($zip->open($tmp, ZipArchive::OVERWRITE) === true, 500, 'Could not create the zip file.');
+        abort_unless($zip->open($tmp, ZipArchive::OVERWRITE) === true, 500, __('messages.download.zip_failed'));
 
         // Layout: Photos/…, then one folder per floor under "360 panoramas/".
         $floorNames = $design->floorNames();
@@ -131,7 +131,7 @@ class DesignController extends Controller
         if ($counters === []) {
             $zip->close();
             @unlink($tmp);
-            abort(404, 'None of this design\'s image files were found on the server. Check that the files exist under public/ or storage/app/public and that "php artisan storage:link" has been run.');
+            abort(404, __('messages.download.no_files'));
         }
 
         $readme = "{$design->title}\n{$design->summary}\n\n";

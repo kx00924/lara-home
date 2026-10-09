@@ -8,7 +8,7 @@
             <x-icon name="search" size="15" class="text-ink-faint" />
             <input name="q" value="{{ $q }}" placeholder="Search title, tags, designer…" class="w-full bg-transparent text-sm outline-none">
         </form>
-        <span class="text-sm text-ink-muted">{{ $designs->total() }} designs</span>
+        <x-admin.per-page :paginator="$designs" />
         <div class="ml-auto flex flex-wrap items-center gap-2">
             <form method="POST" action="{{ route('admin.designs.recompute') }}">@csrf<button class="btn-ghost"><x-icon name="refresh" size="14" /> Recompute trending</button></form>
             <a href="{{ route('admin.designs.create') }}" class="btn-primary"><x-icon name="plus" size="15" /> New design</a>
@@ -20,7 +20,15 @@
             <table class="table-base">
                 <thead><tr>
                     <th class="w-8"><input type="checkbox" :checked="allSelected" @change="toggleAll($event.target.checked)" class="accent-accent" aria-label="Select all"></th>
-                    <th class="w-12">No.</th><th>Design</th><th>Style / Room</th><th>Price</th><th>Images</th><th>Stats</th><th>Published</th><th>Featured</th><th></th>
+                    <th class="w-12">No.</th>
+                    <x-admin.sort-th key="title" label="Design" :sort="$sort" :dir="$dir" />
+                    <th>Style / Room</th>
+                    <x-admin.sort-th key="price" label="Price" :sort="$sort" :dir="$dir" />
+                    <x-admin.sort-th key="images_count" label="Images" :sort="$sort" :dir="$dir" />
+                    <x-admin.sort-th key="views" label="Stats" :sort="$sort" :dir="$dir" />
+                    <x-admin.sort-th key="published" label="Published" :sort="$sort" :dir="$dir" />
+                    <x-admin.sort-th key="featured" label="Featured" :sort="$sort" :dir="$dir" />
+                    <x-admin.sort-th key="created_at" label="Added" :sort="$sort" :dir="$dir" />
                 </tr></thead>
                 <tbody>
                     @foreach($designs as $d)
@@ -42,13 +50,11 @@
                             <td><form method="POST" action="{{ route('admin.designs.toggle', $d) }}">@csrf @method('PATCH')<input type="hidden" name="field" value="published"><x-toggle name="on" :checked="$d->published" submit :confirm="'“'.$d->title.'”'" /></form></td>
                             <td><form method="POST" action="{{ route('admin.designs.toggle', $d) }}">@csrf @method('PATCH')<input type="hidden" name="field" value="featured"><button class="rounded-full p-1.5 {{ $d->featured ? 'text-amber-500' : 'text-ink-faint hover:text-ink' }}" aria-label="Toggle featured"><x-icon name="star" size="16" :fill="$d->featured ? 'currentColor' : 'none'" /></button></form></td>
                             <td>
-                                <div class="flex items-center justify-end gap-3 whitespace-nowrap">
+                                <p class="text-xs text-ink-muted">{{ $d->created_at->format('M j, Y') }}</p>
+                                <div class="mt-1 flex items-center justify-end gap-3 whitespace-nowrap">
                                     <a href="{{ route('designs.show', $d) }}" target="_blank" class="text-ink-faint hover:text-ink" aria-label="Open on site"><x-icon name="external" size="15" /></a>
                                     <a href="{{ route('admin.designs.edit', $d) }}" class="text-ink-faint hover:text-ink" aria-label="Edit"><x-icon name="pencil" size="15" /></a>
-                                    <form method="POST" action="{{ route('admin.designs.destroy', $d) }}" x-data="{ arm: false }" @submit.prevent="arm ? $el.submit() : (arm = true, setTimeout(() => arm = false, 3000))">
-                                        @csrf @method('DELETE')
-                                        <button class="text-sm" :class="arm ? 'font-semibold text-red-600' : 'text-red-500 hover:underline'" x-text="arm ? 'Confirm delete' : 'Delete'"></button>
-                                    </form>
+                                    <x-delete-form :action="route('admin.designs.destroy', $d)" :item="'“'.$d->title.'”'" message="Its images, likes and views are removed. Designs with paid orders are refused; unpublish those instead." />
                                 </div>
                             </td>
                         </tr>

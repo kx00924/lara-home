@@ -14,7 +14,7 @@ class EnsureAdmin
             return redirect()->route('login', ['next' => $request->fullUrl()]);
         }
         if (! $request->user()->isAdmin()) {
-            abort(403, 'Admin access only.');
+            abort(403, __('messages.admin.admin_only'));
         }
 
         return $next($request);

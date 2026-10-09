@@ -66,7 +66,8 @@
                 <div class="mt-5 flex flex-col gap-2">
                     @if($canDownload)
                         <a href="#gallery" class="btn-primary w-full"><x-icon name="unlock" size="15" /> {{ $unlocked && !$design->is_free ? __('ui.design.owned') : __('ui.design.gallery') }}</a>
-                        <a href="{{ route('designs.download', $design) }}" class="btn-ghost w-full"><x-icon name="download" size="15" /> {{ __('ui.design.download_all') }}</a>
+                        {{-- A file download never loads a new page, so the page loader must not react to this link. --}}
+                        <a href="{{ route('designs.download', $design) }}" download data-no-loader class="btn-ghost w-full"><x-icon name="download" size="15" /> {{ __('ui.design.download_all') }}</a>
                     @elseif($buyForm)
                         <form method="POST" action="{{ $buyForm }}">@csrf<button class="btn-primary w-full"><x-icon name="lock" size="15" /> {{ __('ui.design.unlock') }}</button></form>
                     @else

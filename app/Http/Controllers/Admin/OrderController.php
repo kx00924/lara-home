@@ -2,16 +2,20 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Http\Controllers\Admin\Concerns\ListsRecords;
 use App\Http\Controllers\Controller;
 use App\Models\Order;
 use Illuminate\Http\Request;
 
 class OrderController extends Controller
 {
+    use ListsRecords;
+
     public function index(Request $request)
     {
         $status = in_array($request->query('status'), Order::STATUSES) ? $request->query('status') : '';
         $q = trim((string) $request->query('q'));
+        $list = $this->listOptions($request, ['id', 'amount', 'status', 'provider', 'created_at', 'paid_at'], 'created_at', 'desc');
         $orders = Order::with(['user', 'design'])
             ->when($status, fn ($query) => $query->where('status', $status))
             ->when($q !== '', fn ($query) => $query->where(function ($w) use ($q) {
@@ -20,9 +24,9 @@ class OrderController extends Controller
                     ->orWhereHas('user', fn ($u) => $u->where('name', 'like', "%$q%")->orWhere('email', 'like', "%$q%"))
                     ->orWhereHas('design', fn ($d) => $d->where('title', 'like', "%$q%"));
             }))
-            ->latest()->paginate(25)->withQueryString();
+            ->orderBy($list['sort'], $list['dir'])->orderByDesc('id')->paginate($list['perPage'])->withQueryString();
 
-        return view('admin.orders', ['orders' => $orders, 'status' => $status, 'statuses' => Order::STATUSES, 'q' => $q]);
+        return view('admin.orders', ['orders' => $orders, 'status' => $status, 'statuses' => Order::STATUSES, 'q' => $q] + $list);
     }
 
     public function update(Request $request, Order $order)
@@ -30,7 +34,7 @@ class OrderController extends Controller
         $data = $request->validate(['status' => ['required', 'in:'.implode(',', Order::STATUSES)]]);
         $this->setStatus($order, $data['status']);
 
-        return back()->with('success', "Order marked {$data['status']}.");
+        return back()->with('success', __('messages.admin.order_marked', ['status' => $data['status']]));
     }
 
     /** Changes the status of many orders at once. */
@@ -44,7 +48,7 @@ class OrderController extends Controller
         $orders = Order::whereIn('id', $data['ids'])->get();
         $orders->each(fn (Order $order) => $this->setStatus($order, $data['action']));
 
-        return back()->with('success', "{$orders->count()} order(s) marked {$data['action']}.");
+        return back()->with('success', __('messages.admin.bulk_orders', ['count' => $orders->count(), 'status' => $data['action']]));
     }
 
     /** Moves an order to a status, keeping the design's purchase count in step. */

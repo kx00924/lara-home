@@ -93,8 +93,24 @@ class AdminBulkActionsTest extends TestCase
             ->assertSee(route('admin.categories.bulk'), false)
             ->assertSee('?page=2', false);
         $this->actingAs($admin)->get(route('admin.categories.index', ['q' => 'Style 7']))->assertOk()->assertSee('Style 7')->assertDontSee('Style 8');
+
+        // Sorting and page size come from the query string; unknown values fall back to the defaults.
+        $page = $this->actingAs($admin)->get(route('admin.categories.index', ['sort' => 'name', 'dir' => 'desc', 'per_page' => 10]))->assertOk();
+        $this->assertSame(['Style 9', 'Style 8'], $page->viewData('items')->take(2)->pluck('name')->all());
+        $this->assertSame(10, $page->viewData('items')->perPage());
+        $page->assertSee('1–10 of 21')->assertSee('sort=name&amp;dir=asc', false);
+        $fallback = $this->actingAs($admin)->get(route('admin.categories.index', ['sort' => 'password', 'per_page' => 7]))->assertOk();
+        $this->assertSame(['sort_order', 'asc', 20], [$fallback->viewData('sort'), $fallback->viewData('dir'), $fallback->viewData('items')->perPage()]);
+        $this->actingAs($admin)->get(route('admin.users.index', ['sort' => 'spent', 'dir' => 'desc', 'per_page' => 50]))->assertOk()->assertSee('Per page');
+        $this->actingAs($admin)->get(route('admin.orders.index', ['sort' => 'amount', 'dir' => 'asc']))->assertOk();
+        $this->actingAs($admin)->get(route('admin.designs.index', ['sort' => 'images_count', 'dir' => 'desc']))->assertOk();
         $this->actingAs($admin)->get(route('admin.orders.index', ['q' => 'nobody']))->assertOk()->assertSee('No orders match.');
         $this->design('Listed design');
         $this->actingAs($admin)->get(route('admin.designs.index'))->assertOk()->assertSee('confirmToggle(', false)->assertSee("\$dispatch('open-image'", false);
+        // Row deletes go through the confirm dialog, not a second "confirm" click next to the button.
+        User::create(['name' => 'Deletable', 'email' => 'd@example.com', 'password' => 'secret123']);
+        foreach (['admin.designs.index', 'admin.categories.index', 'admin.users.index'] as $route) {
+            $this->actingAs($admin)->get(route($route))->assertOk()->assertSee('confirmDelete(this,', false)->assertDontSee('Confirm delete');
+        }
     }
 }

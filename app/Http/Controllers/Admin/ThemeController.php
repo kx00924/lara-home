@@ -35,6 +35,6 @@ class ThemeController extends Controller
         Setting::put(['activeTheme' => $theme]);
         $request->session()->forget('theme');
 
-        return redirect()->route('admin.themes.index')->with('success', ucfirst(config('themes.'.$theme.'.label', $theme)).' is now the live theme for all visitors.');
+        return redirect()->route('admin.themes.index')->with('success', __('messages.admin.theme_activated', ['theme' => ucfirst(config('themes.'.$theme.'.label', $theme))]));
     }
 }

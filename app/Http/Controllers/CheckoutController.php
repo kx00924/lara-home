@@ -72,7 +72,7 @@ class CheckoutController extends Controller
     public function demoPay(Request $request, Order $order)
     {
         abort_unless($order->user_id === $request->user()->id, 403);
-        abort_if($this->stripeKey(), 400, 'Demo payments are disabled when Stripe is configured.');
+        abort_if($this->stripeKey(), 400, __('messages.checkout.demo_disabled'));
         if ($request->input('outcome') === 'fail') {
             $order->update(['status' => 'failed']);
 

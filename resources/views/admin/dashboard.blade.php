@@ -10,13 +10,12 @@
                 <button type="submit" name="range" value="{{ $key }}" class="rounded-pill px-3 py-1.5 text-xs font-medium {{ $range === $key ? 'bg-surface shadow-soft' : 'text-ink-muted hover:text-ink' }}" @if($key === 'custom') @click.prevent="range = 'custom'" @endif>{{ $key === 'custom' ? 'Custom' : $name }}</button>
             @endforeach
         </div>
+        {{-- No hidden "range" input here: it would be sent together with the preset chip the admin clicked. --}}
         <div x-cloak x-show="range === 'custom'" class="flex flex-wrap items-center gap-2 text-sm">
-            <input type="hidden" name="range" value="custom">
-            <x-icon name="calendar" size="15" class="text-ink-faint" />
-            <input type="date" name="from" value="{{ $from->toDateString() }}" max="{{ now()->toDateString() }}" class="input !w-auto !py-1.5 !text-xs">
+            <x-datepicker name="from" :value="$from->toDateString()" :max="now()->toDateString()" placeholder="From" disabled-expr="range !== 'custom'" />
             <span class="text-ink-faint">to</span>
-            <input type="date" name="to" value="{{ $to->toDateString() }}" max="{{ now()->toDateString() }}" class="input !w-auto !py-1.5 !text-xs">
-            <button class="btn-primary !py-1.5 !text-xs">Apply</button>
+            <x-datepicker name="to" :value="$to->toDateString()" :max="now()->toDateString()" placeholder="To" disabled-expr="range !== 'custom'" />
+            <button name="range" value="custom" class="btn-primary !py-1.5 !text-xs">Apply</button>
         </div>
         <p class="text-sm text-ink-muted"><span class="font-medium text-ink">{{ $label }}</span> · {{ $from->format('M j, Y') }} – {{ $to->format('M j, Y') }}</p>
         <a href="{{ route('admin.designs.create') }}" class="btn-primary ml-auto"><x-icon name="plus" size="15" /> New design</a>

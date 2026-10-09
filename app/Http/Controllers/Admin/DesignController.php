@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Http\Controllers\Admin\Concerns\ListsRecords;
 use App\Http\Controllers\Controller;
 use App\Models\Category;
 use App\Models\Design;
@@ -14,17 +15,20 @@ use Illuminate\Support\Facades\DB;
 
 class DesignController extends Controller
 {
+    use ListsRecords;
+
     public const ANGLES = ['Overview', 'Front view', 'Corner view', 'Detail', 'Window side', 'Night mood', 'Top view', 'Elevation', 'Floor plan'];
 
     public function index(Request $request)
     {
+        $list = $this->listOptions($request, ['title', 'price', 'images_count', 'views', 'purchases', 'likes', 'published', 'featured', 'created_at'], 'created_at', 'desc');
         $designs = Design::with(['category', 'roomType'])->withCount('images')
             ->search($request->query('q'))
-            ->latest()
-            ->paginate(20)
+            ->orderBy($list['sort'], $list['dir'])->orderByDesc('id')
+            ->paginate($list['perPage'])
             ->withQueryString();
 
-        return view('admin.designs.index', ['designs' => $designs, 'q' => $request->query('q')]);
+        return view('admin.designs.index', ['designs' => $designs, 'q' => $request->query('q')] + $list);
     }
 
     public function create()
@@ -56,14 +60,14 @@ class DesignController extends Controller
         $design = new Design;
         $warning = $this->save($request, $design);
 
-        return redirect()->route('admin.designs.edit', $design)->with('success', 'Design created.')->with('warning', $warning);
+        return redirect()->route('admin.designs.edit', $design)->with('success', __('messages.admin.design_created'))->with('warning', $warning);
     }
 
     public function update(Request $request, Design $design)
     {
         $warning = $this->save($request, $design);
 
-        return redirect()->route('admin.designs.edit', $design)->with('success', 'Design saved.')->with('warning', $warning);
+        return redirect()->route('admin.designs.edit', $design)->with('success', __('messages.admin.design_saved'))->with('warning', $warning);
     }
 
     /** Applies one action to many designs at once (publish, unpublish, feature, unfeature, delete). */
@@ -87,9 +91,9 @@ class DesignController extends Controller
         }
         Cache::forget('designs.tags');
         $done = $designs->count() - $skipped;
-        $message = "{$done} design(s) ".['publish' => 'published', 'unpublish' => 'unpublished', 'feature' => 'featured', 'unfeature' => 'unfeatured', 'delete' => 'deleted'][$data['action']].'.';
+        $message = __('messages.admin.bulk_done', ['count' => $done, 'items' => __('messages.admin.nouns.designs'), 'action' => __('messages.admin.actions.'.$data['action'])]);
 
-        return back()->with($skipped ? 'warning' : 'success', $message.($skipped ? " {$skipped} with paid orders were kept; unpublish those instead." : ''));
+        return back()->with($skipped ? 'warning' : 'success', $message.($skipped ? __('messages.admin.bulk_designs_kept', ['count' => $skipped]) : ''));
     }
 
     /** Saves the design and gallery; returns a warning about panoramas that are not 2:1, if any. */
@@ -195,7 +199,7 @@ class DesignController extends Controller
             ->map(fn (array $img) => ($img['title'] ?? '') ?: basename((string) parse_url($img['url'], PHP_URL_PATH)));
 
         return $misshapen->isEmpty() ? null
-            : $misshapen->count().' image(s) marked 360° are not in the 2:1 format 360° cameras produce, so they are left out of the 360° tour and shown as normal photos: '.$misshapen->implode(', ').'. Upload equirectangular images to use the tour.';
+            : __('messages.admin.panoramas_not_two_to_one', ['count' => $misshapen->count(), 'names' => $misshapen->implode(', ')]);
     }
 
     public function toggle(Request $request, Design $design)
@@ -203,25 +207,25 @@ class DesignController extends Controller
         $field = $request->input('field') === 'featured' ? 'featured' : 'published';
         $design->update([$field => ! $design->$field]);
 
-        return back()->with('success', ucfirst($field).' updated.');
+        return back()->with('success', __('messages.admin.design_toggled', ['field' => __('messages.admin.fields.'.$field)]));
     }
 
     public function destroy(Request $request, Design $design)
     {
         $paid = $design->orders()->where('status', 'paid')->count();
         if ($paid && ! $request->boolean('force')) {
-            return back()->with('error', "This design has {$paid} paid order(s). Unpublish it instead, or delete with force.");
+            return back()->with('error', __('messages.admin.design_has_paid_orders', ['count' => $paid]));
         }
         $design->delete();
         Cache::forget('designs.tags');
 
-        return redirect()->route('admin.designs.index')->with('success', 'Design deleted.');
+        return redirect()->route('admin.designs.index')->with('success', __('messages.admin.design_deleted'));
     }
 
     public function recomputeTrending()
     {
         Design::all()->each(fn ($d) => $d->save());
 
-        return back()->with('success', 'Trending scores recomputed.');
+        return back()->with('success', __('messages.admin.trending_recomputed'));
     }
 }

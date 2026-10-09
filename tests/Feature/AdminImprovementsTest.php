@@ -118,6 +118,11 @@ class AdminImprovementsTest extends TestCase
             ->assertOk()->assertSee('1 paid orders in period')->assertSee('$100');
         $this->actingAs($admin)->get(route('admin.dashboard', ['range' => 'custom', 'from' => 'nonsense']))->assertOk();
         $this->actingAs($admin)->get(route('admin.dashboard', ['range' => 'bogus']))->assertOk()->assertSee('Last 30 days');
+
+        // The filter form must not carry a hidden range field: the clicked chip alone decides the period.
+        $page = $this->actingAs($admin)->get(route('admin.dashboard', ['range' => 'week']))->assertOk();
+        $page->assertDontSee('type="hidden" name="range"', false)->assertSee('name="range" value="week"', false);
+        $this->assertSame('week', $page->viewData('range'));
     }
 
     public function test_notification_colours_are_editable_and_reach_every_layout(): void
@@ -133,6 +138,34 @@ class AdminImprovementsTest extends TestCase
         $this->actingAs($admin)->get(route('admin.dashboard'))->assertOk()->assertSee('toastColors', false)->assertSee('#cc0011', false);
         $this->get(route('home'))->assertOk()->assertSee('#ffaa00', false);
         $this->get(route('home', ['theme' => 'neon']))->assertOk()->assertSee('#1133ff', false);
+    }
+
+    public function test_notification_texts_live_in_the_language_files_for_both_languages(): void
+    {
+        $flatten = function (array $a, string $prefix = '') use (&$flatten): array {
+            $out = [];
+            foreach ($a as $k => $v) {
+                $out = array_merge($out, is_array($v) ? $flatten($v, "$prefix$k.") : ["$prefix$k" => $v]);
+            }
+
+            return $out;
+        };
+        $en = $flatten(require lang_path('en/messages.php'));
+        $zh = $flatten(require lang_path('zh/messages.php'));
+        $this->assertSame([], array_diff_key($en, $zh), 'every message needs a Chinese translation');
+        $this->assertSame([], array_diff_key($zh, $en), 'zh/messages.php has keys that en/messages.php lacks');
+        foreach ($en as $key => $text) {
+            preg_match_all('/:\w+/', $text, $m);
+            foreach ($m[0] as $placeholder) {
+                $this->assertStringContainsString($placeholder, $zh[$key], "placeholder $placeholder missing in zh $key");
+            }
+        }
+
+        // The controllers read from the files: a changed text shows up without touching code.
+        $admin = $this->admin();
+        app('translator')->addLines(['messages.admin.settings_saved' => 'Custom wording works.'], 'en');
+        $this->actingAs($admin)->put(route('admin.settings.update'), ['siteName' => 'Home Studio'])->assertSessionHas('success', 'Custom wording works.');
+        $this->actingAs($admin)->withSession(['locale' => 'zh'])->put(route('admin.settings.update'), ['siteName' => 'Home Studio'])->assertSessionHas('success', '设置已保存，网站即时生效。');
     }
 
     public function test_every_layout_includes_the_page_loader_and_confirm_dialog(): void
