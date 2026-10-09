@@ -4,7 +4,6 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Support\Str;
 
 class Category extends Model
 {
@@ -16,7 +15,7 @@ class Category extends Model
     {
         static::saving(function (Category $c) {
             if (blank($c->slug) || $c->isDirty('name')) {
-                $c->slug = Str::slug($c->name);
+                $c->slug = unique_slug($c, $c->name, 'style');
             }
         });
     }

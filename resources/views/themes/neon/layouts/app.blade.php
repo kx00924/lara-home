@@ -12,12 +12,13 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Noto+Sans+KR:wght@400;500;700&family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
     <script>
         // The neon theme is a fixed dark palette; the shared Alpine theme store stays inert.
-        window.SITE_THEME = { defaultTheme: 'dark', allowUserThemeOverride: false };
+        window.SITE_THEME = { defaultTheme: 'dark', allowUserThemeOverride: false, toastColors: {{ Js::from(\App\Models\Setting::toastColors()) }} };
     </script>
     @vite(['resources/css/theme-neon.css', 'resources/js/app.js'])
     @stack('head')
 </head>
 <body class="flex min-h-screen flex-col">
+    @include('partials.page-loader')
     @include('partials.nav')
 
     <main id="main" class="flex-1">
@@ -26,6 +27,7 @@
 
     @include('partials.footer')
     @include('partials.toasts')
+    @include('partials.confirm-dialog')
     @stack('scripts')
 </body>
 </html>

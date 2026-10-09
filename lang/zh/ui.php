@@ -40,5 +40,5 @@ return [
     'theme' => ['title' => '自定义外观', 'mode' => '模式', 'light' => '浅色', 'dark' => '深色', 'system' => '跟随系统', 'accent' => '强调色', 'text' => '文字颜色', 'bg' => '背景', 'font' => '标题字体', 'size' => '文字大小', 'radius' => '圆角', 'reset' => '恢复默认'],
     'checkout' => ['title' => '结算', 'unlock' => '解锁', 'pay' => '支付', 'already_owned' => '你已拥有此设计。', 'declined' => '支付被拒绝（演示）。', 'success_title' => '每个角度都属于你。', 'success_text' => '已加入你的工作室。随时打开完整图库。'],
     'footer' => ['explore' => '探索', 'company' => '工作室', 'contact' => '联系'],
-    'common' => ['save' => '保存', 'cancel' => '取消', 'back' => '返回'],
+    'common' => ['save' => '保存', 'cancel' => '取消', 'back' => '返回', 'loading' => '加载中'],
 ];

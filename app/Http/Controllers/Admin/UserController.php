@@ -37,6 +37,30 @@ class UserController extends Controller
         return back()->with('success', 'Customer updated.');
     }
 
+    /** Applies one action to many accounts at once; the signed-in admin is always skipped. */
+    public function bulk(Request $request)
+    {
+        $data = $request->validate([
+            'action' => ['required', 'in:activate,deactivate,make_customer,make_admin,delete'],
+            'ids' => ['required', 'array', 'max:500'],
+            'ids.*' => ['integer'],
+        ]);
+        $users = User::whereIn('id', $data['ids'])->where('id', '!=', $request->user()->id)->get();
+        foreach ($users as $user) {
+            match ($data['action']) {
+                'activate' => $user->update(['is_active' => true]),
+                'deactivate' => $user->update(['is_active' => false]),
+                'make_customer' => $user->update(['role' => 'customer']),
+                'make_admin' => $user->update(['role' => 'admin']),
+                'delete' => $user->delete(),
+            };
+        }
+        $skipped = count($data['ids']) - $users->count();
+        $message = "{$users->count()} account(s) ".['activate' => 'activated', 'deactivate' => 'deactivated', 'make_customer' => 'set to customer', 'make_admin' => 'set to admin', 'delete' => 'deleted'][$data['action']].'.';
+
+        return back()->with($skipped ? 'warning' : 'success', $message.($skipped ? ' Your own account was skipped.' : ''));
+    }
+
     public function destroy(Request $request, User $user)
     {
         if ($user->id === $request->user()->id) {

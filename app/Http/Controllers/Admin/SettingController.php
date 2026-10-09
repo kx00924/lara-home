@@ -50,11 +50,15 @@ class SettingController extends Controller
             'instagram' => ['nullable', 'string', 'max:300'],
             'pinterest' => ['nullable', 'string', 'max:300'],
             'youtube' => ['nullable', 'string', 'max:300'],
+            'toastSuccessColor' => ['nullable', 'regex:/^#[0-9a-fA-F]{6}$/'],
+            'toastErrorColor' => ['nullable', 'regex:/^#[0-9a-fA-F]{6}$/'],
+            'toastWarningColor' => ['nullable', 'regex:/^#[0-9a-fA-F]{6}$/'],
+            'toastInfoColor' => ['nullable', 'regex:/^#[0-9a-fA-F]{6}$/'],
         ]);
         $data = array_map(fn ($v) => $v ?? '', $data);
         $data['allowUserThemeOverride'] = $request->boolean('allowUserThemeOverride');
-        $data['borderRadius'] = (int) ($data['borderRadius'] ?: 16);
-        $data['currency'] = strtoupper($data['currency'] ?: 'USD');
+        $data['borderRadius'] = (int) (($data['borderRadius'] ?? null) ?: 16);
+        $data['currency'] = strtoupper(($data['currency'] ?? null) ?: 'USD');
         Setting::put($data);
 
         return redirect()->route('admin.settings.edit', ['tab' => $request->input('tab', 'branding')])->with('success', 'Settings saved. The site updates immediately.');

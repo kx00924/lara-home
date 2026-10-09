@@ -3,32 +3,42 @@
 
 @php
     $base = $kind === 'categories' ? 'admin.categories' : 'admin.room-types';
-    $empty = ['name' => '', 'description' => '', 'image' => '', 'icon' => 'home', 'sort_order' => count($items) + 1, 'is_active' => true];
+    $empty = ['name' => '', 'description' => '', 'image' => '', 'icon' => 'home', 'sort_order' => $items->total() + 1, 'is_active' => true];
 @endphp
 
 @section('content')
-{{-- `editing` holds the slug of the item being edited (routes bind by slug), or 'new'. --}}
+{{-- Outer scope: row selection. Inner scope: the edit modal; `editing` holds the slug of the item being edited (routes bind by slug), or 'new'. --}}
+<div x-data="bulkTable()">
 <div x-data="{ editing: null, form: @js($empty), open(item) { this.editing = item ? item.slug : 'new'; this.form = item ? { ...item } : @js($empty); } }" @keydown.escape.window="editing = null">
     <p class="mb-5 text-sm text-ink-muted">{{ $label['hint'] }}</p>
     <div class="mb-5 flex flex-wrap items-center gap-3">
         <form method="GET" class="flex min-w-[240px] flex-1 items-center gap-2 rounded-pill border border-line bg-surface px-4 py-2 sm:max-w-sm"><x-icon name="search" size="15" class="text-ink-faint" /><input name="q" value="{{ $q }}" placeholder="Search {{ strtolower($label['many']) }}…" class="w-full bg-transparent text-sm outline-none"></form>
+        <span class="text-sm text-ink-muted">{{ $items->total() }} {{ strtolower($label['many']) }}</span>
         <button @click="open(null)" class="btn-primary ml-auto"><x-icon name="plus" size="15" /> New {{ $label['one'] }}</button>
     </div>
 
     <div class="card overflow-x-auto">
         <table class="table-base">
-            <thead><tr><th>Name</th><th>Description</th><th>Designs</th><th>Order</th><th>Active</th><th></th></tr></thead>
+            <thead><tr>
+                <th class="w-8"><input type="checkbox" :checked="allSelected" @change="toggleAll($event.target.checked)" class="accent-accent" aria-label="Select all"></th>
+                <th class="w-12">No.</th><th>Name</th><th>Description</th><th>Designs</th><th>Order</th><th>Active</th><th></th>
+            </tr></thead>
             <tbody>
                 @forelse($items as $item)
-                    <tr>
-                        <td><div class="flex items-center gap-3">@if($item->image)<img src="{{ thumb($item->image, 120) }}" alt="" class="h-10 w-14 rounded-lg object-cover">@else<span class="h-10 w-14 rounded-lg bg-surface-2"></span>@endif<div><p class="font-medium">{{ $item->name }}</p><p class="text-xs text-ink-faint">/{{ $item->slug }}</p></div></div></td>
+                    <tr :class="selected.includes('{{ $item->id }}') ? 'bg-accent-soft/40' : ''">
+                        <td><input type="checkbox" value="{{ $item->id }}" data-row-id="{{ $item->id }}" x-model="selected" class="accent-accent" aria-label="Select {{ $item->name }}"></td>
+                        <td class="text-xs text-ink-faint">{{ $items->firstItem() + $loop->index }}</td>
+                        <td><div class="flex items-center gap-3">
+                            @if($item->image)<button type="button" @click="$dispatch('open-image', { url: @js($item->image), title: @js($item->name) })" class="h-10 w-14 shrink-0 overflow-hidden rounded-lg transition hover:ring-2 hover:ring-accent/50" aria-label="View image"><img src="{{ thumb($item->image, 120) }}" alt="" class="h-full w-full object-cover"></button>@else<span class="h-10 w-14 rounded-lg bg-surface-2"></span>@endif
+                            <div><p class="font-medium">{{ $item->name }}</p><p class="text-xs text-ink-faint">/{{ $item->slug }}</p></div>
+                        </div></td>
                         <td class="max-w-md text-ink-muted"><p class="line-clamp-2 text-xs">{{ $item->description }}</p></td>
                         <td>{{ $item->designs_count }}</td>
                         <td>{{ $item->sort_order }}</td>
                         <td>
                             <form method="POST" action="{{ route($base.'.update', $item) }}">@csrf @method('PUT')
                                 <input type="hidden" name="name" value="{{ $item->name }}"><input type="hidden" name="description" value="{{ $item->description }}"><input type="hidden" name="image" value="{{ $item->image }}"><input type="hidden" name="icon" value="{{ $item->icon ?? '' }}"><input type="hidden" name="sort_order" value="{{ $item->sort_order }}">
-                                <x-toggle name="is_active" :checked="$item->is_active" submit />
+                                <x-toggle name="is_active" :checked="$item->is_active" submit :confirm="'“'.$item->name.'”'" />
                             </form>
                         </td>
                         <td>
@@ -39,11 +49,13 @@
                         </td>
                     </tr>
                 @empty
-                    <tr><td colspan="6" class="py-14 text-center text-sm text-ink-muted">Nothing here yet.</td></tr>
+                    <tr><td colspan="8" class="py-14 text-center text-sm text-ink-muted">Nothing here yet.</td></tr>
                 @endforelse
             </tbody>
         </table>
     </div>
+    @include('admin.partials.bulk-bar', ['action' => route($base.'.bulk'), 'actions' => ['activate' => 'Activate', 'deactivate' => 'Deactivate', 'delete' => 'Delete']])
+    {{ $items->links() }}
 
     {{-- Modal --}}
     <div x-cloak x-show="editing" x-transition.opacity class="fixed inset-0 z-[90] flex items-end justify-center bg-black/50 p-0 backdrop-blur-sm sm:items-center sm:p-6" @click.self="editing = null">
@@ -54,8 +66,7 @@
             <div class="space-y-4">
                 <x-field label="Name"><input name="name" x-model="form.name" required class="input"></x-field>
                 <x-field label="Description"><textarea name="description" x-model="form.description" class="input"></textarea></x-field>
-                <x-field label="Image URL"><input name="image" x-model="form.image" class="input"></x-field>
-                <template x-if="form.image"><img :src="form.image" alt="" class="aspect-[3/1] w-full rounded-xl2 object-cover"></template>
+                <x-image-input name="image" model="form.image" label="Image" hint="Shown on the landing page and in menus. Landscape works best." />
                 <div class="grid grid-cols-2 gap-4">
                     <x-field label="Sort order"><input type="number" name="sort_order" x-model="form.sort_order" class="input"></x-field>
                     @if($kind === 'room-types')<x-field label="Icon name" hint="lucide icon id"><input name="icon" x-model="form.icon" class="input"></x-field>@endif
@@ -65,5 +76,6 @@
             </div>
         </form>
     </div>
+</div>
 </div>
 @endsection

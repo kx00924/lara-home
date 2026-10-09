@@ -95,6 +95,11 @@ php artisan images:localize
 It downloads every remote image into the library, writes the thumbnail and rewrites the
 database to the local path. It is safe to re-run.
 
+**"Download all images" on a server:** the zip needs the `zip` extension, the image files
+on disk, and a writable `storage/app/tmp`. Uploads are read from `storage/app/public`
+even when `php artisan storage:link` was not run. When no file can be found the page
+says so, and every skipped image is logged in `storage/logs/laravel.log`.
+
 The library also holds five CC0 test panoramas from Poly Haven (`pano-*.jpg`, 4096×2048).
 They were attached through the admin to *Verdant Haven Lounge* (two floors) and *Tatami
 Rest Suite*, so a fresh `migrate:fresh --seed` does not include them. Attach them again
@@ -140,7 +145,14 @@ theme previews and activation, the admin Themes page and the seeder.
   size and corner radius. Languages: English and Simplified Chinese (EN / ZH).
 
 **Admin panel** (`/admin`)
-- Dashboard: revenue chart, orders, views, catalogue mix, top designs, recent orders.
+- Dashboard: revenue chart, orders, new customers, views, catalogue mix, top designs and
+  recent orders, filtered by period (last 7 / 30 days, this week / month / year, or a
+  custom date range; long ranges chart by month).
+- Every table has search, pagination, numbering and row checkboxes with a bulk-action
+  bar (publish / unpublish / feature / delete designs, activate / deactivate / delete
+  styles and rooms, change order status, change customer role / status / delete).
+- Active, published, status and role changes ask for confirmation first; thumbnails open
+  a full-size viewer; every page change shows a loading overlay.
 - Designs: create/edit, publish/feature toggles, price (0 = free), delete.
 - **Gallery manager**: add by URL or upload, reorder, per-image title, angle and
   description, cover star. Each image is either a *Photo* or a *360° panorama*; panoramas
@@ -153,8 +165,12 @@ theme previews and activation, the admin Themes page and the seeder.
 - Design styles and room types CRUD.
 - Orders (status changes) and customers (role, active, delete).
 - Themes: preview any theme for your own session, or activate it for all visitors.
-- Site settings: branding, hero, announcement, theme defaults (colours, fonts, radius,
-  whether visitors may override), currency, contact and socials.
+- Site settings: branding, hero (upload or URL), announcement, theme defaults (colours,
+  fonts, radius, whether visitors may override), notification colours (success / error /
+  warning / info, with live preview), currency, contact and socials.
+- Image fields (style and room images, hero, design cover) accept a pasted URL or a file
+  upload. Titles in Chinese or other non-Latin scripts get a generated slug
+  (`design-xxxxxx`) instead of an empty one.
 
 ## Project layout
 

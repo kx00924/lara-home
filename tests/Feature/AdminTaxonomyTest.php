@@ -25,7 +25,7 @@ class AdminTaxonomyTest extends TestCase
         $admin = $this->admin();
         $this->actingAs($admin)->get(route('admin.categories.index'))
             ->assertOk()
-            ->assertSee('onchange="this.form.requestSubmit()"', false)
+            ->assertSee('onchange="confirmToggle(this,', false)
             ->assertDontSee('onchange=&quot;', false)
             ->assertSee(route('admin.categories.update', 'modern-hanok'), false);
         $this->actingAs($admin)->get(route('admin.room-types.index'))

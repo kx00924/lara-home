@@ -10,7 +10,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Serif:ital,wght@0,400;0,500;0,600;1,400&family=Noto+Sans:wght@300;400;500;600;700&family=Noto+Sans+KR:wght@300;400;500;700&family=Noto+Sans+JP:wght@300;400;500;700&family=Noto+Serif+KR:wght@400;600&family=Noto+Serif+JP:wght@400;600&display=swap" rel="stylesheet">
     <script>
-        window.SITE_THEME = {{ Js::from(collect($site)->only(['defaultTheme','accentColor','textColorLight','textColorDark','backgroundLight','backgroundDark','headingFont','bodyFont','borderRadius','allowUserThemeOverride'])) }};
+        window.SITE_THEME = {{ Js::from(collect($site)->only(['defaultTheme','accentColor','textColorLight','textColorDark','backgroundLight','backgroundDark','headingFont','bodyFont','borderRadius','allowUserThemeOverride'])->put('toastColors', \App\Models\Setting::toastColors())) }};
         // Apply the stored mode before styles load to avoid a flash.
         try {
             var t = JSON.parse(localStorage.getItem('home.theme') || '{}');
@@ -23,6 +23,7 @@
     @stack('head')
 </head>
 <body class="min-h-screen flex flex-col">
+    @include('partials.page-loader')
     @include('partials.nav')
 
     <main class="flex-1">
@@ -32,6 +33,7 @@
     @include('partials.footer')
     @include('partials.theme-drawer')
     @include('partials.toasts')
+    @include('partials.confirm-dialog')
     @stack('scripts')
 </body>
 </html>

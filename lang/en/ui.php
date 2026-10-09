@@ -40,5 +40,5 @@ return [
     'theme' => ['title' => 'Customize your view', 'mode' => 'Mode', 'light' => 'Light', 'dark' => 'Dark', 'system' => 'System', 'accent' => 'Accent colour', 'text' => 'Text colour', 'bg' => 'Background', 'font' => 'Heading font', 'size' => 'Text size', 'radius' => 'Corner radius', 'reset' => 'Reset to site default'],
     'checkout' => ['title' => 'Checkout', 'unlock' => 'Unlock', 'pay' => 'Pay', 'already_owned' => 'You already own this design.', 'declined' => 'Payment was declined (demo).', 'success_title' => 'Every angle is yours.', 'success_text' => 'is now in your studio. Open the full gallery whenever you like.'],
     'footer' => ['explore' => 'Explore', 'company' => 'Studio', 'contact' => 'Contact'],
-    'common' => ['save' => 'Save', 'cancel' => 'Cancel', 'back' => 'Back'],
+    'common' => ['save' => 'Save', 'cancel' => 'Cancel', 'back' => 'Back', 'loading' => 'Loading'],
 ];

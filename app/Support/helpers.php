@@ -1,6 +1,8 @@
 <?php
 
 use App\Models\Setting;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Str;
 
 if (! function_exists('setting')) {
     function setting(string $key, mixed $default = null): mixed
@@ -31,6 +33,25 @@ if (! function_exists('active_theme')) {
         $theme = session('theme') ?: Setting::get('activeTheme', 'default');
 
         return in_array($theme, available_themes(), true) ? $theme : 'default';
+    }
+}
+
+if (! function_exists('unique_slug')) {
+    /**
+     * URL slug for a model from its name or title, unique within its table.
+     * Titles without Latin letters (Chinese, for example) would slug to an empty
+     * string, so those get "<prefix>-<random>" instead of an empty, unroutable slug.
+     */
+    function unique_slug(Model $model, ?string $source, string $prefix): string
+    {
+        $base = Str::slug((string) $source) ?: $prefix.'-'.strtolower(Str::random(6));
+        $slug = $base;
+        $i = 1;
+        while ($model->newQuery()->where('slug', $slug)->where($model->getKeyName(), '!=', $model->getKey() ?? 0)->exists()) {
+            $slug = $base.'-'.(++$i);
+        }
+
+        return $slug;
     }
 }
 

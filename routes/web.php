@@ -52,6 +52,11 @@ Route::middleware('auth')->group(function () {
 Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(function () {
     Route::get('/', Admin\DashboardController::class)->name('dashboard');
     Route::post('/designs/recompute-trending', [Admin\DesignController::class, 'recomputeTrending'])->name('designs.recompute');
+    Route::post('/designs/bulk', [Admin\DesignController::class, 'bulk'])->name('designs.bulk');
+    Route::post('/categories/bulk', [Admin\CategoryController::class, 'bulk'])->name('categories.bulk');
+    Route::post('/room-types/bulk', [Admin\RoomTypeController::class, 'bulk'])->name('room-types.bulk');
+    Route::post('/orders/bulk', [Admin\OrderController::class, 'bulk'])->name('orders.bulk');
+    Route::post('/users/bulk', [Admin\UserController::class, 'bulk'])->name('users.bulk');
     Route::patch('/designs/{design}/toggle', [Admin\DesignController::class, 'toggle'])->name('designs.toggle');
     Route::resource('designs', Admin\DesignController::class)->except('show');
     Route::resource('categories', Admin\CategoryController::class)->except(['show', 'create', 'edit']);

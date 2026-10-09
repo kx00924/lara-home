@@ -4,7 +4,6 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Support\Str;
 
 class RoomType extends Model
 {
@@ -16,7 +15,7 @@ class RoomType extends Model
     {
         static::saving(function (RoomType $r) {
             if (blank($r->slug) || $r->isDirty('name')) {
-                $r->slug = Str::slug($r->name);
+                $r->slug = unique_slug($r, $r->name, 'room');
             }
         });
     }

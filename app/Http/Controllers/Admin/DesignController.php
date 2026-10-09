@@ -56,14 +56,40 @@ class DesignController extends Controller
         $design = new Design;
         $warning = $this->save($request, $design);
 
-        return redirect()->route('admin.designs.edit', $design)->with('success', 'Design created.')->with('info', $warning);
+        return redirect()->route('admin.designs.edit', $design)->with('success', 'Design created.')->with('warning', $warning);
     }
 
     public function update(Request $request, Design $design)
     {
         $warning = $this->save($request, $design);
 
-        return redirect()->route('admin.designs.edit', $design)->with('success', 'Design saved.')->with('info', $warning);
+        return redirect()->route('admin.designs.edit', $design)->with('success', 'Design saved.')->with('warning', $warning);
+    }
+
+    /** Applies one action to many designs at once (publish, unpublish, feature, unfeature, delete). */
+    public function bulk(Request $request)
+    {
+        $data = $request->validate([
+            'action' => ['required', 'in:publish,unpublish,feature,unfeature,delete'],
+            'ids' => ['required', 'array', 'max:500'],
+            'ids.*' => ['integer'],
+        ]);
+        $designs = Design::whereIn('id', $data['ids'])->get();
+        $skipped = 0;
+        foreach ($designs as $design) {
+            match ($data['action']) {
+                'publish' => $design->update(['published' => true]),
+                'unpublish' => $design->update(['published' => false]),
+                'feature' => $design->update(['featured' => true]),
+                'unfeature' => $design->update(['featured' => false]),
+                'delete' => $design->orders()->where('status', 'paid')->exists() ? $skipped++ : $design->delete(),
+            };
+        }
+        Cache::forget('designs.tags');
+        $done = $designs->count() - $skipped;
+        $message = "{$done} design(s) ".['publish' => 'published', 'unpublish' => 'unpublished', 'feature' => 'featured', 'unfeature' => 'unfeatured', 'delete' => 'deleted'][$data['action']].'.';
+
+        return back()->with($skipped ? 'warning' : 'success', $message.($skipped ? " {$skipped} with paid orders were kept; unpublish those instead." : ''));
     }
 
     /** Saves the design and gallery; returns a warning about panoramas that are not 2:1, if any. */
@@ -99,6 +125,11 @@ class DesignController extends Controller
         $images = collect($data['images'] ?? [])->values()->map(fn (array $img) => ['url' => LocalImage::relative($img['url'])] + $img);
         if (! empty($data['cover_image'])) {
             $data['cover_image'] = LocalImage::relative($data['cover_image']);
+            // A cover that was a gallery image and has now been removed or replaced falls back to the first photo.
+            $wasInGallery = $design->exists && $design->images()->where('url', $data['cover_image'])->exists();
+            if ($wasInGallery && ! $images->pluck('url')->contains($data['cover_image'])) {
+                $data['cover_image'] = null;
+            }
         }
         $firstPhoto = $images->first(fn (array $img) => ($img['kind'] ?? 'photo') !== DesignImage::KIND_PANORAMA) ?? $images->first();
         $floors = collect($data['floors'] ?? [])->map(fn ($name) => trim((string) $name))->filter()->values()->all();

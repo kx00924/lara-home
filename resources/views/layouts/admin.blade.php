@@ -9,12 +9,13 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Serif:wght@400;500;600&family=Noto+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
     <script>
-        window.SITE_THEME = {{ Js::from(collect($site)->only(['defaultTheme','accentColor','textColorLight','textColorDark','backgroundLight','backgroundDark','headingFont','bodyFont','borderRadius','allowUserThemeOverride'])) }};
+        window.SITE_THEME = {{ Js::from(collect($site)->only(['defaultTheme','accentColor','textColorLight','textColorDark','backgroundLight','backgroundDark','headingFont','bodyFont','borderRadius','allowUserThemeOverride'])->put('toastColors', \App\Models\Setting::toastColors())) }};
         try { var t = JSON.parse(localStorage.getItem('home.theme') || '{}'); var mode = t.mode || window.SITE_THEME.defaultTheme || 'dark'; document.documentElement.classList.toggle('dark', mode === 'dark' || (mode === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches)); } catch (e) {}
     </script>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 <body class="min-h-screen">
+@include('partials.page-loader')
 @php
     $nav = [
         ['admin.dashboard', 'layout-dashboard', 'Dashboard', 'admin.dashboard'],
@@ -57,6 +58,8 @@
     </div>
 </div>
 @include('partials.toasts')
+@include('partials.confirm-dialog')
+@include('partials.image-lightbox')
 @stack('scripts')
 </body>
 </html>

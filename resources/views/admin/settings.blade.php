@@ -34,7 +34,7 @@
             <x-field label="Headline" name="heroTitle"><input name="heroTitle" x-model="f.heroTitle" class="input"></x-field>
             <x-field label="Sub-headline" name="heroSubtitle"><textarea name="heroSubtitle" x-model="f.heroSubtitle" class="input"></textarea></x-field>
             <x-field label="Button text" name="heroCtaText"><input name="heroCtaText" x-model="f.heroCtaText" class="input"></x-field>
-            <x-field label="Hero image URL" name="heroImage"><input name="heroImage" x-model="f.heroImage" class="input"></x-field>
+            <x-image-input name="heroImage" model="f.heroImage" label="Hero image" hint="Large landscape photo behind the landing headline." />
             <template x-if="f.heroImage"><img :src="f.heroImage" alt="" class="aspect-[3/1] w-full rounded-xl2 object-cover"></template>
             <div class="grid grid-cols-3 gap-3">
                 <x-field label="Stat: designs"><input name="statDesigns" x-model="f.statDesigns" class="input"></x-field>
@@ -71,7 +71,23 @@
             <div><p class="label">Corner radius · <span x-text="f.borderRadius + 'px'"></span></p><input type="range" name="borderRadius" min="0" max="32" step="2" x-model.number="f.borderRadius" class="w-full accent-accent"></div>
             <div class="flex items-center justify-between"><span class="text-sm">Allow visitors to customise their view</span><x-toggle name="allowUserThemeOverride" :checked="(bool) $s['allowUserThemeOverride']" /></div>
         </section>
-        <section class="card p-6">
+        <section class="card space-y-6 p-6">
+            <div>
+                <h2 class="text-xl">Notifications</h2>
+                <p class="text-sm text-ink-muted">Colours of the pop-up messages shown after an action. Changes apply site-wide as soon as you save.</p>
+                <div class="mt-4 grid grid-cols-2 gap-3">
+                    @foreach([['toastSuccessColor', 'Success', 'success', 'Saved successfully.'], ['toastErrorColor', 'Error / fail', 'error', 'Something went wrong.'], ['toastWarningColor', 'Warning', 'warning', 'Check this before continuing.'], ['toastInfoColor', 'Info', 'info', 'Just so you know.']] as [$k, $l, $type, $sample])
+                        <label class="block">
+                            <span class="label">{{ $l }}</span>
+                            <span class="flex items-center gap-2 rounded-xl2 border border-line bg-surface px-2 py-1.5">
+                                <input type="color" x-model="f.{{ $k }}" class="h-7 w-9 cursor-pointer rounded border-0 bg-transparent p-0">
+                                <input name="{{ $k }}" x-model="f.{{ $k }}" class="w-full bg-transparent font-mono text-xs uppercase outline-none">
+                                <button type="button" class="shrink-0 text-xs text-accent hover:underline" @click="window.SITE_THEME.toastColors = { success: f.toastSuccessColor, error: f.toastErrorColor, warning: f.toastWarningColor, info: f.toastInfoColor }; $dispatch('toast', { message: @js($sample), type: @js($type) })">Preview</button>
+                            </span>
+                        </label>
+                    @endforeach
+                </div>
+            </div>
             <h2 class="mb-3 text-xl">Preview</h2>
             <div class="space-y-4">
                 @foreach([false, true] as $dark)

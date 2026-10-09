@@ -8,7 +8,9 @@ use App\Models\RoomType;
 use App\Support\LocalImage;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use ZipArchive;
@@ -92,8 +94,13 @@ class DesignController extends Controller
         abort_unless($design->published || $request->user()?->isAdmin(), 404);
         abort_unless($design->unlockedFor($request->user()), 403, 'Unlock this design to download its images.');
 
+        abort_unless(class_exists(ZipArchive::class), 500, 'Downloads need the PHP "zip" extension, which is not installed on this server.');
         $design->load('images');
-        $tmp = tempnam(sys_get_temp_dir(), 'design-');
+        // Build the zip inside storage/: the system temp dir is often unwritable on shared hosting.
+        $tmpDir = storage_path('app/tmp');
+        File::ensureDirectoryExists($tmpDir);
+        $tmp = tempnam($tmpDir, 'design-') ?: tempnam(sys_get_temp_dir(), 'design-');
+        abort_unless($tmp, 500, 'Could not create a temporary file for the zip.');
         $zip = new ZipArchive;
         abort_unless($zip->open($tmp, ZipArchive::OVERWRITE) === true, 500, 'Could not create the zip file.');
 
@@ -104,6 +111,8 @@ class DesignController extends Controller
         foreach ($design->images as $image) {
             $bytes = $this->imageContents($image->url);
             if ($bytes === null) {
+                Log::warning("Download of design {$design->slug}: image file not found, skipped.", ['url' => $image->url]);
+
                 continue;
             }
             if ($image->isViewablePanorama()) {
@@ -119,7 +128,11 @@ class DesignController extends Controller
             $zip->addFromString($name, $bytes);
             $contents[$folder][] = basename($name);
         }
-        abort_if($counters === [], 404, 'No image files were available for this design.');
+        if ($counters === []) {
+            $zip->close();
+            @unlink($tmp);
+            abort(404, 'None of this design\'s image files were found on the server. Check that the files exist under public/ or storage/app/public and that "php artisan storage:link" has been run.');
+        }
 
         $readme = "{$design->title}\n{$design->summary}\n\n";
         foreach ($contents as $folder => $files) {

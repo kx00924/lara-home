@@ -2,6 +2,8 @@
 
 namespace App\Support;
 
+use Illuminate\Support\Facades\Storage;
+
 /**
  * Maps image URLs to files on this server. Images live under public/ (the
  * library and the storage link); their URLs may be relative ("/storage/...")
@@ -23,8 +25,18 @@ class LocalImage
             return null;
         }
         $path = public_path($relative);
+        if (is_file($path)) {
+            return $path;
+        }
+        // Uploads are served through the public/storage link; read them from the disk
+        // itself so a missing link (common on shared hosting) does not hide them.
+        if (str_starts_with($relative, 'storage/')) {
+            $stored = Storage::disk('public')->path(substr($relative, 8));
 
-        return is_file($path) ? $path : null;
+            return is_file($stored) ? $stored : null;
+        }
+
+        return null;
     }
 
     /** Strips this site's own origin so stored URLs keep working when the domain changes. */

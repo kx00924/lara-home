@@ -7,7 +7,6 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Collection;
-use Illuminate\Support\Str;
 
 class Design extends Model
 {
@@ -30,13 +29,7 @@ class Design extends Model
     {
         static::saving(function (Design $d) {
             if (blank($d->slug) || $d->isDirty('title')) {
-                $base = Str::slug($d->title);
-                $slug = $base;
-                $i = 1;
-                while (static::where('slug', $slug)->where('id', '!=', $d->id ?? 0)->exists()) {
-                    $slug = $base.'-'.(++$i);
-                }
-                $d->slug = $slug;
+                $d->slug = unique_slug($d, $d->title, 'design');
             }
             $d->trending_score = $d->computeTrending();
         });

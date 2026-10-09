@@ -145,7 +145,7 @@ class PanoramaTourTest extends TestCase
             $this->actingAs($this->admin())->put(route('admin.designs.update', $design), [
                 'title' => $design->title, 'category_id' => $design->category_id, 'room_type_id' => $design->room_type_id, 'price' => 0, 'published' => 1,
                 'images' => [['url' => 'http://localhost/images/library/phpunit-portrait.jpg', 'kind' => 'panorama', 'floor' => 1, 'title' => 'Tall shot']],
-            ])->assertRedirect()->assertSessionHas('info', fn (string $m) => str_contains($m, 'Tall shot') && str_contains($m, '2:1'));
+            ])->assertRedirect()->assertSessionHas('warning', fn (string $m) => str_contains($m, 'Tall shot') && str_contains($m, '2:1'));
 
             $this->assertSame('/images/library/phpunit-portrait.jpg', $design->fresh('images')->images->first()->url, 'own-host URLs are stored site-relative');
         } finally {

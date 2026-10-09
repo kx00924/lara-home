@@ -10,7 +10,7 @@ class CategoryController extends Controller
 {
     public function index(Request $request)
     {
-        $items = Category::withCount('designs')->when($request->query('q'), fn ($q, $s) => $q->where('name', 'like', "%$s%"))->orderBy('sort_order')->orderBy('name')->get();
+        $items = Category::withCount('designs')->when($request->query('q'), fn ($q, $s) => $q->where('name', 'like', "%$s%"))->orderBy('sort_order')->orderBy('name')->paginate(20)->withQueryString();
 
         return view('admin.taxonomy', [
             'kind' => 'categories',
@@ -42,6 +42,29 @@ class CategoryController extends Controller
         $category->delete();
 
         return back()->with('success', 'Style deleted.');
+    }
+
+    /** Applies one action to many style(s) at once (activate, deactivate, delete). */
+    public function bulk(Request $request)
+    {
+        $data = $request->validate([
+            'action' => ['required', 'in:activate,deactivate,delete'],
+            'ids' => ['required', 'array', 'max:500'],
+            'ids.*' => ['integer'],
+        ]);
+        $items = Category::whereIn('id', $data['ids'])->get();
+        $skipped = 0;
+        foreach ($items as $item) {
+            match ($data['action']) {
+                'activate' => $item->update(['is_active' => true]),
+                'deactivate' => $item->update(['is_active' => false]),
+                'delete' => $item->designs()->exists() ? $skipped++ : $item->delete(),
+            };
+        }
+        $done = $items->count() - $skipped;
+        $message = "{$done} style(s) ".['activate' => 'activated', 'deactivate' => 'deactivated', 'delete' => 'deleted'][$data['action']].'.';
+
+        return back()->with($skipped ? 'warning' : 'success', $message.($skipped ? " {$skipped} still have designs and were kept." : ''));
     }
 
     private function validated(Request $request, ?int $id = null): array

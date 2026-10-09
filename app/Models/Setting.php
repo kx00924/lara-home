@@ -50,7 +50,26 @@ class Setting extends Model
         'statDesigns' => '500+',
         'statDesigners' => '40',
         'statCustomers' => '12k',
+        // Notification (toast) colours, editable in Site settings → Theme defaults.
+        'toastSuccessColor' => '#10b981',
+        'toastErrorColor' => '#ef4444',
+        'toastWarningColor' => '#f59e0b',
+        'toastInfoColor' => '#3b82f6',
     ];
+
+    /** Toast colours keyed by notification type, for the layouts and JavaScript. @return array<string, string> */
+    public static function toastColors(): array
+    {
+        // Settings are cached forever; a cache built before these keys existed lacks them.
+        $all = static::allValues() + self::DEFAULTS;
+
+        return [
+            'success' => $all['toastSuccessColor'] ?: self::DEFAULTS['toastSuccessColor'],
+            'error' => $all['toastErrorColor'] ?: self::DEFAULTS['toastErrorColor'],
+            'warning' => $all['toastWarningColor'] ?: self::DEFAULTS['toastWarningColor'],
+            'info' => $all['toastInfoColor'] ?: self::DEFAULTS['toastInfoColor'],
+        ];
+    }
 
     public static function allValues(): array
     {

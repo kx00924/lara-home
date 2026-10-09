@@ -407,7 +407,11 @@ Alpine.data('galleryManager', (initial, angles, uploadUrl, floors = ['Ground flo
         } finally { this.uploading = false; this.$refs.file.value = ''; }
     },
     move(i, dir) { const j = i + dir; if (j < 0 || j >= this.images.length) return; [this.images[i], this.images[j]] = [this.images[j], this.images[i]]; },
-    remove(i) { this.images.splice(i, 1); },
+    remove(i) {
+        // Removing the cover image lets the cover fall back to the first photo.
+        if (this.images[i]?.url === this.cover) this.cover = '';
+        this.images.splice(i, 1);
+    },
     effectiveCover() { return this.cover || this.images.find((im) => im.kind !== 'panorama')?.url || this.images[0]?.url || ''; },
     };
 });
@@ -447,14 +451,120 @@ Alpine.data('carousel', (autoplayMs = 5000) => ({
 }));
 
 /* ---------------- Toasts ---------------- */
+/* ---------------- Toasts: success / error / warning / info, colours from Site settings ---------------- */
+const TOAST_FALLBACK = { success: '#10b981', error: '#ef4444', warning: '#f59e0b', info: '#3b82f6' };
 Alpine.data('toasts', () => ({
     items: [],
     push(message, type = 'info') {
+        if (!(type in TOAST_FALLBACK)) type = 'info';
         const id = Math.random().toString(36).slice(2);
         this.items.push({ id, message, type });
-        setTimeout(() => this.remove(id), 4200);
+        setTimeout(() => this.remove(id), type === 'error' || type === 'warning' ? 6500 : 4200);
     },
     remove(id) { this.items = this.items.filter((t) => t.id !== id); },
+    color(type) { return (window.SITE_THEME?.toastColors || {})[type] || TOAST_FALLBACK[type]; },
+}));
+
+/* ---------------- Confirm dialog: window.confirmDialog({...}) resolves true/false ---------------- */
+Alpine.store('confirm', {
+    open: false, title: '', message: '', okLabel: 'Confirm', danger: false, resolver: null,
+    ask({ title = 'Are you sure?', message = '', okLabel = 'Confirm', danger = false } = {}) {
+        this.resolver?.(false);
+        Object.assign(this, { open: true, title, message, okLabel, danger });
+        return new Promise((resolve) => { this.resolver = resolve; });
+    },
+    close(result) { this.open = false; const r = this.resolver; this.resolver = null; r?.(result); },
+});
+window.confirmDialog = (opts) => Alpine.store('confirm').ask(opts);
+
+// Status toggles: revert the switch, ask, then submit the row's form on yes.
+window.confirmToggle = async (input, label = 'this item') => {
+    const next = input.checked;
+    input.checked = !next;
+    const ok = await window.confirmDialog({
+        title: next ? `Activate ${label}?` : `Deactivate ${label}?`,
+        message: next ? 'It becomes visible and usable on the site straight away.' : 'It is hidden from the site until you activate it again.',
+        okLabel: next ? 'Activate' : 'Deactivate', danger: !next,
+    });
+    if (!ok) return;
+    input.checked = next;
+    input.form.requestSubmit();
+};
+// Status / role selects: remember the previous value on focus, confirm the change, revert on cancel.
+window.confirmSelect = async (select, label = 'this item') => {
+    const prev = select.dataset.prev ?? '';
+    const chosen = select.options[select.selectedIndex]?.textContent.trim() || select.value;
+    const ok = await window.confirmDialog({ title: `Change ${label}?`, message: `${label.charAt(0).toUpperCase() + label.slice(1)} will be set to “${chosen}”.`, okLabel: 'Change' });
+    if (!ok) { select.value = prev; return; }
+    select.form.submit();
+};
+
+/* ---------------- Page loader: shown while the next page loads ---------------- */
+Alpine.store('loader', {
+    visible: false, timer: null,
+    show() { clearTimeout(this.timer); this.timer = setTimeout(() => { this.visible = true; }, 150); },
+    hide() { clearTimeout(this.timer); this.visible = false; },
+});
+document.addEventListener('click', (e) => {
+    const a = e.target.closest('a[href]');
+    if (!a || e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+    if ((a.target && a.target !== '_self') || a.hasAttribute('download') || a.dataset.noLoader !== undefined) return;
+    const url = new URL(a.href, location.href);
+    if (url.origin !== location.origin || !/^https?:$/.test(url.protocol)) return;
+    if (url.pathname === location.pathname && url.search === location.search && url.hash) return;
+    Alpine.store('loader').show();
+});
+document.addEventListener('submit', (e) => {
+    const form = e.target;
+    if (form.dataset.noLoader !== undefined || (form.target && form.target !== '_self')) return;
+    // Let Alpine's own @submit.prevent handlers run first.
+    setTimeout(() => { if (!e.defaultPrevented) Alpine.store('loader').show(); }, 0);
+});
+window.addEventListener('pageshow', () => Alpine.store('loader').hide());
+window.addEventListener('pagehide', () => Alpine.store('loader').hide());
+
+/* ---------------- Bulk selection for admin tables ---------------- */
+Alpine.data('bulkTable', () => ({
+    selected: [],
+    get ids() { return [...this.$root.querySelectorAll('input[data-row-id]')].map((el) => el.dataset.rowId); },
+    get allSelected() { return this.ids.length > 0 && this.ids.every((id) => this.selected.includes(id)); },
+    toggleAll(on) { this.selected = on ? this.ids : []; },
+    clear() { this.selected = []; },
+    async run(form) {
+        if (!this.selected.length) return;
+        const select = form.querySelector('[name=action]');
+        const action = select.value;
+        const label = select.options[select.selectedIndex]?.textContent.trim() || action;
+        const ok = await window.confirmDialog({
+            title: `${label}: ${this.selected.length} selected`,
+            message: action === 'delete' ? 'Deleted items cannot be recovered.' : 'This applies to every selected row.',
+            okLabel: label, danger: action === 'delete',
+        });
+        if (!ok) return;
+        Alpine.store('loader').show();
+        form.submit();
+    },
+}));
+
+/* ---------------- Single-image upload field (admin forms) ---------------- */
+Alpine.data('imageUpload', (uploadUrl) => ({
+    busy: false,
+    async send(files) {
+        if (!files?.length) return null;
+        this.busy = true;
+        const fd = new FormData();
+        fd.append('images[]', files[0]);
+        try {
+            const r = await fetch(uploadUrl, { method: 'POST', body: fd, headers: { 'X-CSRF-TOKEN': document.querySelector('meta[name=csrf-token]').content, Accept: 'application/json' } });
+            const j = await r.json();
+            if (!r.ok) throw new Error(j.message || 'Upload failed');
+            window.dispatchEvent(new CustomEvent('toast', { detail: { message: 'Image uploaded.', type: 'success' } }));
+            return j.files[0].url;
+        } catch (e) {
+            window.dispatchEvent(new CustomEvent('toast', { detail: { message: e.message, type: 'error' } }));
+            return null;
+        } finally { this.busy = false; }
+    },
 }));
 
 window.Alpine = Alpine;

@@ -136,7 +136,7 @@
             <section class="card p-6">
                 <h2 class="mb-3 text-xl">Cover preview</h2>
                 <div class="aspect-[4/3] overflow-hidden rounded-xl2 bg-surface-2"><template x-if="effectiveCover()"><img :src="effectiveCover()" alt="" class="h-full w-full object-cover"></template></div>
-                <x-field label="Cover image URL" class="mt-3"><input name="cover_image" x-model="cover" placeholder="Defaults to the first photo" class="input"></x-field>
+                <x-image-input name="cover_image" model="cover" label="Cover image" hint="Leave empty to use the first photo, star a gallery image, or upload a separate cover." class="mt-3" />
             </section>
         </aside>
     </div>
