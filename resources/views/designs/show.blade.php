@@ -65,8 +65,7 @@
                 <div class="mt-6 space-y-2">
                     @if($design->is_free || $unlocked)
                         <a href="#gallery" class="btn-primary w-full"><x-icon name="unlock" /> {{ $unlocked && !$design->is_free ? __('ui.design.owned') : __('ui.design.gallery') }}</a>
-                        {{-- A file download never loads a new page, so the page loader must not react to this link. --}}
-                        <a href="{{ route('designs.download', $design) }}" download data-no-loader class="btn-ghost w-full"><x-icon name="download" size="15" /> {{ __('ui.design.download_all') }}</a>
+                        <x-download-button :design="$design" />
                         <p class="text-center text-xs text-ink-faint">{{ __('ui.design.download_hint') }}</p>
                     @elseif($buyForm)
                         <form method="POST" action="{{ $buyForm }}">@csrf<button class="btn-primary w-full"><x-icon name="lock" /> {{ __('ui.design.unlock') }}</button></form>

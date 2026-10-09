@@ -134,7 +134,8 @@ theme previews and activation, the admin Themes page and the seeder.
 - **360° tour**: one panorama viewer per floor (drag, pinch or scroll to look around,
   auto-rotate, fullscreen), with a chip per room. Each room opens at the starting view the
   admin chose.
-- **Download all images**: a zip with `Photos/` and `360 panoramas/Floor N - <name>/`
+- **Download all images**: the button shows a spinner while the zip is built and a
+  percentage while it downloads; a zip with `Photos/` and `360 panoramas/Floor N - <name>/`
   folders plus a README; the original file types are kept.
 - Free designs are fully visible without login. Premium designs show only the cover and
   lock the other images and the tour until purchase (locked image URLs are never rendered).

@@ -25,6 +25,7 @@ return [
         'views' => 'views',
         'palette' => 'Colour palette', 'palette_hint' => 'The main wall, wood and accent tones used in this design, for matching paint and materials.',
         'download_all' => 'Download all images', 'download' => 'Download', 'download_hint' => 'Full-resolution JPEGs in one zip file.',
+        'download_preparing' => 'Preparing your zip…', 'download_progress' => 'Downloading… :percent%', 'download_done' => 'Your zip is ready.', 'download_failed' => 'The download failed. Please try again.',
         'like' => 'Like', 'liked' => 'Liked', 'like_hint' => 'Likes help this design rank in Trending.',
         'floor' => 'Floor', 'rooms' => 'Rooms',
         'tour' => '360° tour', 'tour_sub' => 'Walk through every floor. Drag to look around, switch rooms, go fullscreen.', 'rooms_360' => '{1} :count room in 360°|[2,*] :count rooms in 360°', 'badge_360' => '360°', 'drag_hint' => 'Drag to look around · scroll or pinch to zoom', 'autorotate' => 'Auto-rotate', 'reset_view' => 'Reset view', 'fullscreen' => 'Fullscreen', 'loading' => 'Loading panorama…', 'tour_locked' => 'Unlock this design to walk through every room in 360°.', 'webgl_missing' => 'Your browser cannot show 360° views, so the flat panorama is shown instead.',

@@ -25,6 +25,7 @@ return [
         'views' => '浏览',
         'palette' => '配色方案', 'palette_hint' => '此设计使用的主要墙面、木材与点缀色，便于匹配涂料和材料。',
         'download_all' => '下载全部图片', 'download' => '下载', 'download_hint' => '高清 JPEG 打包为一个 zip 文件。',
+        'download_preparing' => '正在打包…', 'download_progress' => '下载中… :percent%', 'download_done' => '压缩包已准备好。', 'download_failed' => '下载失败，请重试。',
         'like' => '点赞', 'liked' => '已点赞', 'like_hint' => '点赞会影响热门排序。',
         'floor' => '楼层', 'rooms' => '房间',
         'tour' => '360°全景游览', 'tour_sub' => '逐层浏览。拖动环顾四周，切换房间，全屏观看。', 'rooms_360' => ':count 个 360° 房间', 'badge_360' => '360°', 'drag_hint' => '拖动环顾 · 滚轮或双指缩放', 'autorotate' => '自动旋转', 'reset_view' => '重置视角', 'fullscreen' => '全屏', 'loading' => '正在加载全景…', 'tour_locked' => '解锁此设计即可 360° 浏览每个房间。', 'webgl_missing' => '您的浏览器不支持 360° 显示，已改为显示平面全景图。',

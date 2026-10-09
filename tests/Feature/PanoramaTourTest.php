@@ -84,6 +84,8 @@ class PanoramaTourTest extends TestCase
         foreach (['default', 'neon'] as $theme) {
             $this->get(route('designs.show', ['design' => $design, 'theme' => $theme]))
                 ->assertOk()
+                ->assertSee('downloadButton(', false) // "Download all images" shows progress instead of the page loader
+                ->assertSee('Preparing your zip', false)
                 ->assertSee('1/1', false)
                 ->assertDontSee('1/3', false)
                 ->assertDontSee('download="two-floor-house-2.jpg"', false);

@@ -560,6 +560,50 @@ Alpine.data('bulkTable', () => ({
     },
 }));
 
+/* ---------------- "Download all images": fetch the zip with progress, then save it ---------------- */
+// A plain link gives no feedback while the server builds the zip, so the button fetches it itself:
+// spinner while the server prepares the file, a percentage while it streams, then the save dialog.
+Alpine.data('downloadButton', (url, filename, labels = {}) => ({
+    busy: false, percent: null,
+    get text() {
+        if (!this.busy) return labels.idle || 'Download';
+        return this.percent === null ? (labels.preparing || 'Preparing…') : (labels.progress || 'Downloading… :percent%').replace(':percent', this.percent);
+    },
+    async start() {
+        if (this.busy) return;
+        this.busy = true;
+        this.percent = null;
+        try {
+            const r = await fetch(url, { credentials: 'same-origin', headers: { Accept: 'application/zip' } });
+            if (!r.ok) throw new Error(labels.failed || 'The download failed.');
+            const total = Number(r.headers.get('Content-Length')) || 0;
+            const reader = r.body.getReader();
+            const chunks = [];
+            let received = 0;
+            for (;;) {
+                const { done, value } = await reader.read();
+                if (done) break;
+                chunks.push(value);
+                received += value.length;
+                if (total) this.percent = Math.min(100, Math.round((received / total) * 100));
+            }
+            const name = (r.headers.get('Content-Disposition') || '').match(/filename\*?=(?:UTF-8'')?"?([^";]+)"?/)?.[1] || filename;
+            const href = URL.createObjectURL(new Blob(chunks, { type: 'application/zip' }));
+            const a = Object.assign(document.createElement('a'), { href, download: decodeURIComponent(name) });
+            document.body.appendChild(a);
+            a.click();
+            a.remove();
+            setTimeout(() => URL.revokeObjectURL(href), 60000);
+            window.dispatchEvent(new CustomEvent('toast', { detail: { message: labels.done || 'Your zip is ready.', type: 'success' } }));
+        } catch (e) {
+            window.dispatchEvent(new CustomEvent('toast', { detail: { message: e.message || labels.failed, type: 'error' } }));
+        } finally {
+            this.busy = false;
+            this.percent = null;
+        }
+    },
+}));
+
 /* ---------------- Date picker: a popover calendar backing a hidden input (no library) ---------------- */
 const pad2 = (n) => String(n).padStart(2, '0');
 const ymd = (d) => `${d.getFullYear()}-${pad2(d.getMonth() + 1)}-${pad2(d.getDate())}`;

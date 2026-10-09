@@ -21,24 +21,26 @@ summary code{font-weight:600} .counts{margin-left:auto;font-size:12px;color:var(
 pre.log{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:12px 16px;font-size:13px;overflow-x:auto}
 </style></head><body><main>
 <h1>Home Studio · changes on 9 October 2026</h1>
-<p class="muted">Everything between commit <code>2dc2386</code> (6 Oct) and the current working tree: your commits today plus the order-delete work that is not committed yet. 58 files · <span class="pill add">+1520</span> <span class="pill del">−267</span>. Built assets, the PDF and the lock file are left out.</p>
-<pre class="log">d0c4556 2026-10-09 11:42 ...
+<p class="muted">Everything between commit <code>2dc2386</code> (6 Oct) and the current working tree: your commits today plus the work that is not committed yet. 59 files · <span class="pill add">+1580</span> <span class="pill del">−268</span>. Built assets, the PDF and the lock file are left out.</p>
+<pre class="log">b01d493 2026-10-09 11:53 ...
+d0c4556 2026-10-09 11:42 ...
 bac5035 2026-10-09 11:16 ...
 7aaef92 2026-10-09 11:11 issue fix</pre>
 <h2>What changed, by feature</h2>
 <div class="feature"><h3>Slugs for Chinese titles</h3><div class="muted">Titles without Latin letters no longer produce an empty slug; a migration repairs old rows.</div><ul><li><a href="#f-app/Support/helpers.php"><code>app/Support/helpers.php</code></a> <span class="muted">+21 −0</span></li><li><a href="#f-app/Models/Design.php"><code>app/Models/Design.php</code></a> <span class="muted">+4 −9</span></li><li><a href="#f-app/Models/Category.php"><code>app/Models/Category.php</code></a> <span class="muted">+1 −2</span></li><li><a href="#f-app/Models/RoomType.php"><code>app/Models/RoomType.php</code></a> <span class="muted">+1 −2</span></li><li><a href="#f-database/migrations/2026_10_09_000001_repair_empty_slugs.php"><code>database/migrations/2026_10_09_000001_repair_empty_slugs.php</code></a> <span class="muted">+27 −0</span></li></ul></div>
-<div class="feature"><h3>Cover image follows the gallery</h3><div class="muted">Removing or replacing the cover image falls back to the first photo.</div><ul><li><a href="#f-app/Http/Controllers/Admin/DesignController.php"><code>app/Http/Controllers/Admin/DesignController.php</code></a> <span class="muted">+45 −10</span></li><li><a href="#f-resources/js/app.js"><code>resources/js/app.js</code></a> <span class="muted">+162 −2</span></li></ul></div>
+<div class="feature"><h3>Cover image follows the gallery</h3><div class="muted">Removing or replacing the cover image falls back to the first photo.</div><ul><li><a href="#f-app/Http/Controllers/Admin/DesignController.php"><code>app/Http/Controllers/Admin/DesignController.php</code></a> <span class="muted">+45 −10</span></li><li><a href="#f-resources/js/app.js"><code>resources/js/app.js</code></a> <span class="muted">+206 −2</span></li></ul></div>
 <div class="feature"><h3>Downloads on a server</h3><div class="muted">Reads uploads without the storage link, builds the zip in storage/app/tmp, clear errors, logs skipped files.</div><ul><li><a href="#f-app/Support/LocalImage.php"><code>app/Support/LocalImage.php</code></a> <span class="muted">+13 −1</span></li><li><a href="#f-app/Http/Controllers/DesignController.php"><code>app/Http/Controllers/DesignController.php</code></a> <span class="muted">+17 −4</span></li></ul></div>
 <div class="feature"><h3>MariaDB / MySQL fix</h3><div class="muted">The similar-designs query no longer uses a two-argument MIN().</div><ul><li><a href="#f-app/Models/Design.php"><code>app/Models/Design.php</code></a> <span class="muted">+4 −9</span></li></ul></div>
-<div class="feature"><h3>Admin tables: search, sort, page size, numbering, bulk actions</h3><div class="muted">All five tables; bulk routes and controller actions (including delete for orders); confirm dialogs.</div><ul><li><a href="#f-app/Http/Controllers/Admin/Concerns/ListsRecords.php"><code>app/Http/Controllers/Admin/Concerns/ListsRecords.php</code></a> <span class="muted">+26 −0</span></li><li><a href="#f-app/Support/AdminTable.php"><code>app/Support/AdminTable.php</code></a> <span class="muted">+12 −0</span></li><li><a href="#f-routes/web.php"><code>routes/web.php</code></a> <span class="muted">+7 −1</span></li><li><a href="#f-app/Http/Controllers/Admin/CategoryController.php"><code>app/Http/Controllers/Admin/CategoryController.php</code></a> <span class="muted">+34 −6</span></li><li><a href="#f-app/Http/Controllers/Admin/RoomTypeController.php"><code>app/Http/Controllers/Admin/RoomTypeController.php</code></a> <span class="muted">+34 −6</span></li><li><a href="#f-app/Http/Controllers/Admin/OrderController.php"><code>app/Http/Controllers/Admin/OrderController.php</code></a> <span class="muted">+68 −10</span></li><li><a href="#f-app/Http/Controllers/Admin/UserController.php"><code>app/Http/Controllers/Admin/UserController.php</code></a> <span class="muted">+35 −7</span></li><li><a href="#f-resources/views/admin/designs/index.blade.php"><code>resources/views/admin/designs/index.blade.php</code></a> <span class="muted">+63 −46</span></li><li><a href="#f-resources/views/admin/taxonomy.blade.php"><code>resources/views/admin/taxonomy.blade.php</code></a> <span class="muted">+28 −10</span></li><li><a href="#f-resources/views/admin/orders.blade.php"><code>resources/views/admin/orders.blade.php</code></a> <span class="muted">+57 −33</span></li><li><a href="#f-resources/views/admin/users.blade.php"><code>resources/views/admin/users.blade.php</code></a> <span class="muted">+52 −35</span></li><li><a href="#f-resources/views/admin/partials/bulk-bar.blade.php"><code>resources/views/admin/partials/bulk-bar.blade.php</code></a> <span class="muted">+16 −0</span></li><li><a href="#f-resources/views/components/admin/sort-th.blade.php"><code>resources/views/components/admin/sort-th.blade.php</code></a> <span class="muted">+13 −0</span></li><li><a href="#f-resources/views/components/admin/per-page.blade.php"><code>resources/views/components/admin/per-page.blade.php</code></a> <span class="muted">+15 −0</span></li><li><a href="#f-resources/views/components/delete-form.blade.php"><code>resources/views/components/delete-form.blade.php</code></a> <span class="muted">+6 −0</span></li><li><a href="#f-resources/views/components/toggle.blade.php"><code>resources/views/components/toggle.blade.php</code></a> <span class="muted">+7 −5</span></li></ul></div>
+<div class="feature"><h3>Admin tables: search, sort, page size, numbering, bulk actions</h3><div class="muted">All five tables; bulk routes and controller actions (delete included for orders); confirm dialogs; green toggle switches.</div><ul><li><a href="#f-app/Http/Controllers/Admin/Concerns/ListsRecords.php"><code>app/Http/Controllers/Admin/Concerns/ListsRecords.php</code></a> <span class="muted">+26 −0</span></li><li><a href="#f-app/Support/AdminTable.php"><code>app/Support/AdminTable.php</code></a> <span class="muted">+12 −0</span></li><li><a href="#f-routes/web.php"><code>routes/web.php</code></a> <span class="muted">+7 −1</span></li><li><a href="#f-app/Http/Controllers/Admin/CategoryController.php"><code>app/Http/Controllers/Admin/CategoryController.php</code></a> <span class="muted">+34 −6</span></li><li><a href="#f-app/Http/Controllers/Admin/RoomTypeController.php"><code>app/Http/Controllers/Admin/RoomTypeController.php</code></a> <span class="muted">+34 −6</span></li><li><a href="#f-app/Http/Controllers/Admin/OrderController.php"><code>app/Http/Controllers/Admin/OrderController.php</code></a> <span class="muted">+68 −10</span></li><li><a href="#f-app/Http/Controllers/Admin/UserController.php"><code>app/Http/Controllers/Admin/UserController.php</code></a> <span class="muted">+35 −7</span></li><li><a href="#f-resources/views/admin/designs/index.blade.php"><code>resources/views/admin/designs/index.blade.php</code></a> <span class="muted">+63 −46</span></li><li><a href="#f-resources/views/admin/taxonomy.blade.php"><code>resources/views/admin/taxonomy.blade.php</code></a> <span class="muted">+28 −10</span></li><li><a href="#f-resources/views/admin/orders.blade.php"><code>resources/views/admin/orders.blade.php</code></a> <span class="muted">+57 −33</span></li><li><a href="#f-resources/views/admin/users.blade.php"><code>resources/views/admin/users.blade.php</code></a> <span class="muted">+52 −35</span></li><li><a href="#f-resources/views/admin/partials/bulk-bar.blade.php"><code>resources/views/admin/partials/bulk-bar.blade.php</code></a> <span class="muted">+16 −0</span></li><li><a href="#f-resources/views/components/admin/sort-th.blade.php"><code>resources/views/components/admin/sort-th.blade.php</code></a> <span class="muted">+13 −0</span></li><li><a href="#f-resources/views/components/admin/per-page.blade.php"><code>resources/views/components/admin/per-page.blade.php</code></a> <span class="muted">+15 −0</span></li><li><a href="#f-resources/views/components/delete-form.blade.php"><code>resources/views/components/delete-form.blade.php</code></a> <span class="muted">+6 −0</span></li><li><a href="#f-resources/views/components/toggle.blade.php"><code>resources/views/components/toggle.blade.php</code></a> <span class="muted">+10 −5</span></li></ul></div>
 <div class="feature"><h3>Dashboard period filter + date picker</h3><div class="muted">7/30 days, week, month, year, custom range; calendar without a package.</div><ul><li><a href="#f-app/Http/Controllers/Admin/DashboardController.php"><code>app/Http/Controllers/Admin/DashboardController.php</code></a> <span class="muted">+65 −16</span></li><li><a href="#f-resources/views/admin/dashboard.blade.php"><code>resources/views/admin/dashboard.blade.php</code></a> <span class="muted">+45 −26</span></li><li><a href="#f-resources/views/components/datepicker.blade.php"><code>resources/views/components/datepicker.blade.php</code></a> <span class="muted">+30 −0</span></li></ul></div>
 <div class="feature"><h3>Image upload fields</h3><div class="muted">Upload button beside every image URL field (styles, rooms, hero, cover).</div><ul><li><a href="#f-resources/views/components/image-input.blade.php"><code>resources/views/components/image-input.blade.php</code></a> <span class="muted">+21 −0</span></li><li><a href="#f-resources/views/admin/settings.blade.php"><code>resources/views/admin/settings.blade.php</code></a> <span class="muted">+18 −2</span></li><li><a href="#f-resources/views/admin/designs/form.blade.php"><code>resources/views/admin/designs/form.blade.php</code></a> <span class="muted">+1 −1</span></li></ul></div>
 <div class="feature"><h3>Notifications</h3><div class="muted">Four colours editable in Site settings; all PHP messages moved to lang/*/messages.php.</div><ul><li><a href="#f-app/Models/Setting.php"><code>app/Models/Setting.php</code></a> <span class="muted">+19 −0</span></li><li><a href="#f-app/Http/Controllers/Admin/SettingController.php"><code>app/Http/Controllers/Admin/SettingController.php</code></a> <span class="muted">+7 −3</span></li><li><a href="#f-resources/views/partials/toasts.blade.php"><code>resources/views/partials/toasts.blade.php</code></a> <span class="muted">+9 −5</span></li><li><a href="#f-resources/views/themes/neon/partials/toasts.blade.php"><code>resources/views/themes/neon/partials/toasts.blade.php</code></a> <span class="muted">+9 −5</span></li><li><a href="#f-lang/en/messages.php"><code>lang/en/messages.php</code></a> <span class="muted">+71 −0</span></li><li><a href="#f-lang/zh/messages.php"><code>lang/zh/messages.php</code></a> <span class="muted">+69 −0</span></li><li><a href="#f-app/Http/Controllers/Admin/ImageCropController.php"><code>app/Http/Controllers/Admin/ImageCropController.php</code></a> <span class="muted">+4 −4</span></li><li><a href="#f-app/Http/Controllers/Admin/ThemeController.php"><code>app/Http/Controllers/Admin/ThemeController.php</code></a> <span class="muted">+1 −1</span></li><li><a href="#f-app/Http/Controllers/AuthController.php"><code>app/Http/Controllers/AuthController.php</code></a> <span class="muted">+1 −1</span></li><li><a href="#f-app/Http/Controllers/CheckoutController.php"><code>app/Http/Controllers/CheckoutController.php</code></a> <span class="muted">+1 −1</span></li><li><a href="#f-app/Http/Middleware/EnsureAdmin.php"><code>app/Http/Middleware/EnsureAdmin.php</code></a> <span class="muted">+1 −1</span></li></ul></div>
-<div class="feature"><h3>Page loader, confirm dialog, image lightbox</h3><div class="muted">Shared partials included by every layout.</div><ul><li><a href="#f-resources/views/partials/page-loader.blade.php"><code>resources/views/partials/page-loader.blade.php</code></a> <span class="muted">+17 −0</span></li><li><a href="#f-resources/views/partials/confirm-dialog.blade.php"><code>resources/views/partials/confirm-dialog.blade.php</code></a> <span class="muted">+13 −0</span></li><li><a href="#f-resources/views/partials/image-lightbox.blade.php"><code>resources/views/partials/image-lightbox.blade.php</code></a> <span class="muted">+9 −0</span></li><li><a href="#f-resources/views/layouts/app.blade.php"><code>resources/views/layouts/app.blade.php</code></a> <span class="muted">+3 −1</span></li><li><a href="#f-resources/views/layouts/admin.blade.php"><code>resources/views/layouts/admin.blade.php</code></a> <span class="muted">+4 −1</span></li><li><a href="#f-resources/views/themes/neon/layouts/app.blade.php"><code>resources/views/themes/neon/layouts/app.blade.php</code></a> <span class="muted">+3 −1</span></li><li><a href="#f-resources/views/designs/show.blade.php"><code>resources/views/designs/show.blade.php</code></a> <span class="muted">+2 −1</span></li><li><a href="#f-resources/views/themes/neon/designs/show.blade.php"><code>resources/views/themes/neon/designs/show.blade.php</code></a> <span class="muted">+2 −1</span></li><li><a href="#f-resources/views/components/icon.blade.php"><code>resources/views/components/icon.blade.php</code></a> <span class="muted">+4 −0</span></li><li><a href="#f-lang/en/ui.php"><code>lang/en/ui.php</code></a> <span class="muted">+1 −1</span></li><li><a href="#f-lang/zh/ui.php"><code>lang/zh/ui.php</code></a> <span class="muted">+1 −1</span></li></ul></div>
-<div class="feature"><h3>Tests and docs</h3><div class="muted">New feature tests; README and handbook updated.</div><ul><li><a href="#f-tests/Feature/AdminBulkActionsTest.php"><code>tests/Feature/AdminBulkActionsTest.php</code></a> <span class="muted">+125 −0</span></li><li><a href="#f-tests/Feature/AdminImprovementsTest.php"><code>tests/Feature/AdminImprovementsTest.php</code></a> <span class="muted">+177 −0</span></li><li><a href="#f-tests/Feature/AdminTaxonomyTest.php"><code>tests/Feature/AdminTaxonomyTest.php</code></a> <span class="muted">+1 −1</span></li><li><a href="#f-tests/Feature/PanoramaTourTest.php"><code>tests/Feature/PanoramaTourTest.php</code></a> <span class="muted">+1 −1</span></li><li><a href="#f-README.md"><code>README.md</code></a> <span class="muted">+21 −3</span></li></ul></div>
+<div class="feature"><h3>Download button with progress</h3><div class="muted">Download all images shows a spinner, then a percentage, then saves the zip.</div><ul><li><a href="#f-resources/views/components/download-button.blade.php"><code>resources/views/components/download-button.blade.php</code></a> <span class="muted">+9 −0</span></li></ul></div>
+<div class="feature"><h3>Page loader, confirm dialog, image lightbox</h3><div class="muted">Shared partials included by every layout.</div><ul><li><a href="#f-resources/views/partials/page-loader.blade.php"><code>resources/views/partials/page-loader.blade.php</code></a> <span class="muted">+17 −0</span></li><li><a href="#f-resources/views/partials/confirm-dialog.blade.php"><code>resources/views/partials/confirm-dialog.blade.php</code></a> <span class="muted">+13 −0</span></li><li><a href="#f-resources/views/partials/image-lightbox.blade.php"><code>resources/views/partials/image-lightbox.blade.php</code></a> <span class="muted">+9 −0</span></li><li><a href="#f-resources/views/layouts/app.blade.php"><code>resources/views/layouts/app.blade.php</code></a> <span class="muted">+3 −1</span></li><li><a href="#f-resources/views/layouts/admin.blade.php"><code>resources/views/layouts/admin.blade.php</code></a> <span class="muted">+4 −1</span></li><li><a href="#f-resources/views/themes/neon/layouts/app.blade.php"><code>resources/views/themes/neon/layouts/app.blade.php</code></a> <span class="muted">+3 −1</span></li><li><a href="#f-resources/views/designs/show.blade.php"><code>resources/views/designs/show.blade.php</code></a> <span class="muted">+1 −1</span></li><li><a href="#f-resources/views/themes/neon/designs/show.blade.php"><code>resources/views/themes/neon/designs/show.blade.php</code></a> <span class="muted">+1 −1</span></li><li><a href="#f-resources/views/components/icon.blade.php"><code>resources/views/components/icon.blade.php</code></a> <span class="muted">+4 −0</span></li><li><a href="#f-lang/en/ui.php"><code>lang/en/ui.php</code></a> <span class="muted">+2 −1</span></li><li><a href="#f-lang/zh/ui.php"><code>lang/zh/ui.php</code></a> <span class="muted">+2 −1</span></li></ul></div>
+<div class="feature"><h3>Tests and docs</h3><div class="muted">New feature tests; README and handbook updated.</div><ul><li><a href="#f-tests/Feature/AdminBulkActionsTest.php"><code>tests/Feature/AdminBulkActionsTest.php</code></a> <span class="muted">+125 −0</span></li><li><a href="#f-tests/Feature/AdminImprovementsTest.php"><code>tests/Feature/AdminImprovementsTest.php</code></a> <span class="muted">+177 −0</span></li><li><a href="#f-tests/Feature/AdminTaxonomyTest.php"><code>tests/Feature/AdminTaxonomyTest.php</code></a> <span class="muted">+1 −1</span></li><li><a href="#f-tests/Feature/PanoramaTourTest.php"><code>tests/Feature/PanoramaTourTest.php</code></a> <span class="muted">+3 −1</span></li><li><a href="#f-README.md"><code>README.md</code></a> <span class="muted">+23 −4</span></li></ul></div>
 <h2>Every file, with its diff</h2><div class="toolbar"><button onclick="document.querySelectorAll('details').forEach(d=>d.open=true)">Expand all</button><button onclick="document.querySelectorAll('details').forEach(d=>d.open=false)">Collapse all</button></div>
-<details id="f-README.md"><summary><span class="pill mod">modified</span><code>README.md</code><span class="counts">+21 −3</span></summary><div class="diff"><div class="meta">diff --git a/README.md b/README.md</div>
-<div class="meta">index 4155ab4..a1e60f8 100644</div>
+<details id="f-README.md"><summary><span class="pill mod">modified</span><code>README.md</code><span class="counts">+23 −4</span></summary><div class="diff"><div class="meta">diff --git a/README.md b/README.md</div>
+<div class="meta">index 4155ab4..d7fb556 100644</div>
 <div class="meta">--- a/README.md</div>
 <div class="meta">+++ b/README.md</div>
 <div class="hunk">@@ -95,6 +95,11 @@ ### Images</div>
@@ -53,7 +55,17 @@ bac5035 2026-10-09 11:16 ...
 <div class="ctx"> The library also holds five CC0 test panoramas from Poly Haven (`pano-*.jpg`, 4096×2048).</div>
 <div class="ctx"> They were attached through the admin to *Verdant Haven Lounge* (two floors) and *Tatami</div>
 <div class="ctx"> Rest Suite*, so a fresh `migrate:fresh --seed` does not include them. Attach them again</div>
-<div class="hunk">@@ -140,7 +145,15 @@ ## Features</div>
+<div class="hunk">@@ -129,7 +134,8 @@ ## Features</div>
+<div class="ctx"> - **360° tour**: one panorama viewer per floor (drag, pinch or scroll to look around,</div>
+<div class="ctx">   auto-rotate, fullscreen), with a chip per room. Each room opens at the starting view the</div>
+<div class="ctx">   admin chose.</div>
+<div class="del">-- **Download all images**: a zip with `Photos/` and `360 panoramas/Floor N - &lt;name&gt;/`</div>
+<div class="add">+- **Download all images**: the button shows a spinner while the zip is built and a</div>
+<div class="add">+  percentage while it downloads; a zip with `Photos/` and `360 panoramas/Floor N - &lt;name&gt;/`</div>
+<div class="ctx">   folders plus a README; the original file types are kept.</div>
+<div class="ctx"> - Free designs are fully visible without login. Premium designs show only the cover and</div>
+<div class="ctx">   lock the other images and the tour until purchase (locked image URLs are never rendered).</div>
+<div class="hunk">@@ -140,7 +146,15 @@ ## Features</div>
 <div class="ctx">   size and corner radius. Languages: English and Simplified Chinese (EN / ZH).</div>
 <div class="ctx"> </div>
 <div class="ctx"> **Admin panel** (`/admin`)</div>
@@ -70,7 +82,7 @@ bac5035 2026-10-09 11:16 ...
 <div class="ctx"> - Designs: create/edit, publish/feature toggles, price (0 = free), delete.</div>
 <div class="ctx"> - **Gallery manager**: add by URL or upload, reorder, per-image title, angle and</div>
 <div class="ctx">   description, cover star. Each image is either a *Photo* or a *360° panorama*; panoramas</div>
-<div class="hunk">@@ -153,8 +166,12 @@ ## Features</div>
+<div class="hunk">@@ -153,8 +167,12 @@ ## Features</div>
 <div class="ctx"> - Design styles and room types CRUD.</div>
 <div class="ctx"> - Orders (status changes) and customers (role, active, delete).</div>
 <div class="ctx"> - Themes: preview any theme for your own session, or activate it for all visitors.</div>
@@ -85,7 +97,7 @@ bac5035 2026-10-09 11:16 ...
 <div class="ctx"> </div>
 <div class="ctx"> ## Project layout</div>
 <div class="ctx"> </div>
-<div class="hunk">@@ -172,6 +189,7 @@ ## Project layout</div>
+<div class="hunk">@@ -172,6 +190,7 @@ ## Project layout</div>
 <div class="ctx"> resources/js/app.js     Alpine: theme store, search box, design page, 360° tour, gallery manager + cropper, toasts</div>
 <div class="ctx"> resources/js/panorama.js     Dependency-free WebGL equirectangular panorama viewer</div>
 <div class="ctx"> lang/{en,zh}/ui.php     UI strings</div>
@@ -1198,11 +1210,19 @@ bac5035 2026-10-09 11:16 ...
 <div class="add">+    &#x27;auth&#x27; =&gt; [&#x27;deactivated&#x27; =&gt; &#x27;This account has been deactivated.&#x27;],</div>
 <div class="add">+    &#x27;newsletter&#x27; =&gt; [&#x27;subscribed&#x27; =&gt; &#x27;Thank you. You are on the list.&#x27;],</div>
 <div class="add">+];</div></div></details>
-<details id="f-lang/en/ui.php"><summary><span class="pill mod">modified</span><code>lang/en/ui.php</code><span class="counts">+1 −1</span></summary><div class="diff"><div class="meta">diff --git a/lang/en/ui.php b/lang/en/ui.php</div>
-<div class="meta">index 56d164f..a236a75 100644</div>
+<details id="f-lang/en/ui.php"><summary><span class="pill mod">modified</span><code>lang/en/ui.php</code><span class="counts">+2 −1</span></summary><div class="diff"><div class="meta">diff --git a/lang/en/ui.php b/lang/en/ui.php</div>
+<div class="meta">index 56d164f..4a77839 100644</div>
 <div class="meta">--- a/lang/en/ui.php</div>
 <div class="meta">+++ b/lang/en/ui.php</div>
-<div class="hunk">@@ -40,5 +40,5 @@</div>
+<div class="hunk">@@ -25,6 +25,7 @@</div>
+<div class="ctx">         &#x27;views&#x27; =&gt; &#x27;views&#x27;,</div>
+<div class="ctx">         &#x27;palette&#x27; =&gt; &#x27;Colour palette&#x27;, &#x27;palette_hint&#x27; =&gt; &#x27;The main wall, wood and accent tones used in this design, for matching paint and materials.&#x27;,</div>
+<div class="ctx">         &#x27;download_all&#x27; =&gt; &#x27;Download all images&#x27;, &#x27;download&#x27; =&gt; &#x27;Download&#x27;, &#x27;download_hint&#x27; =&gt; &#x27;Full-resolution JPEGs in one zip file.&#x27;,</div>
+<div class="add">+        &#x27;download_preparing&#x27; =&gt; &#x27;Preparing your zip…&#x27;, &#x27;download_progress&#x27; =&gt; &#x27;Downloading… :percent%&#x27;, &#x27;download_done&#x27; =&gt; &#x27;Your zip is ready.&#x27;, &#x27;download_failed&#x27; =&gt; &#x27;The download failed. Please try again.&#x27;,</div>
+<div class="ctx">         &#x27;like&#x27; =&gt; &#x27;Like&#x27;, &#x27;liked&#x27; =&gt; &#x27;Liked&#x27;, &#x27;like_hint&#x27; =&gt; &#x27;Likes help this design rank in Trending.&#x27;,</div>
+<div class="ctx">         &#x27;floor&#x27; =&gt; &#x27;Floor&#x27;, &#x27;rooms&#x27; =&gt; &#x27;Rooms&#x27;,</div>
+<div class="ctx">         &#x27;tour&#x27; =&gt; &#x27;360° tour&#x27;, &#x27;tour_sub&#x27; =&gt; &#x27;Walk through every floor. Drag to look around, switch rooms, go fullscreen.&#x27;, &#x27;rooms_360&#x27; =&gt; &#x27;{1} :count room in 360°|[2,*] :count rooms in 360°&#x27;, &#x27;badge_360&#x27; =&gt; &#x27;360°&#x27;, &#x27;drag_hint&#x27; =&gt; &#x27;Drag to look around · scroll or pinch to zoom&#x27;, &#x27;autorotate&#x27; =&gt; &#x27;Auto-rotate&#x27;, &#x27;reset_view&#x27; =&gt; &#x27;Reset view&#x27;, &#x27;fullscreen&#x27; =&gt; &#x27;Fullscreen&#x27;, &#x27;loading&#x27; =&gt; &#x27;Loading panorama…&#x27;, &#x27;tour_locked&#x27; =&gt; &#x27;Unlock this design to walk through every room in 360°.&#x27;, &#x27;webgl_missing&#x27; =&gt; &#x27;Your browser cannot show 360° views, so the flat panorama is shown instead.&#x27;,</div>
+<div class="hunk">@@ -40,5 +41,5 @@</div>
 <div class="ctx">     &#x27;theme&#x27; =&gt; [&#x27;title&#x27; =&gt; &#x27;Customize your view&#x27;, &#x27;mode&#x27; =&gt; &#x27;Mode&#x27;, &#x27;light&#x27; =&gt; &#x27;Light&#x27;, &#x27;dark&#x27; =&gt; &#x27;Dark&#x27;, &#x27;system&#x27; =&gt; &#x27;System&#x27;, &#x27;accent&#x27; =&gt; &#x27;Accent colour&#x27;, &#x27;text&#x27; =&gt; &#x27;Text colour&#x27;, &#x27;bg&#x27; =&gt; &#x27;Background&#x27;, &#x27;font&#x27; =&gt; &#x27;Heading font&#x27;, &#x27;size&#x27; =&gt; &#x27;Text size&#x27;, &#x27;radius&#x27; =&gt; &#x27;Corner radius&#x27;, &#x27;reset&#x27; =&gt; &#x27;Reset to site default&#x27;],</div>
 <div class="ctx">     &#x27;checkout&#x27; =&gt; [&#x27;title&#x27; =&gt; &#x27;Checkout&#x27;, &#x27;unlock&#x27; =&gt; &#x27;Unlock&#x27;, &#x27;pay&#x27; =&gt; &#x27;Pay&#x27;, &#x27;already_owned&#x27; =&gt; &#x27;You already own this design.&#x27;, &#x27;declined&#x27; =&gt; &#x27;Payment was declined (demo).&#x27;, &#x27;success_title&#x27; =&gt; &#x27;Every angle is yours.&#x27;, &#x27;success_text&#x27; =&gt; &#x27;is now in your studio. Open the full gallery whenever you like.&#x27;],</div>
 <div class="ctx">     &#x27;footer&#x27; =&gt; [&#x27;explore&#x27; =&gt; &#x27;Explore&#x27;, &#x27;company&#x27; =&gt; &#x27;Studio&#x27;, &#x27;contact&#x27; =&gt; &#x27;Contact&#x27;],</div>
@@ -1284,19 +1304,27 @@ bac5035 2026-10-09 11:16 ...
 <div class="add">+    &#x27;auth&#x27; =&gt; [&#x27;deactivated&#x27; =&gt; &#x27;该账户已被停用。&#x27;],</div>
 <div class="add">+    &#x27;newsletter&#x27; =&gt; [&#x27;subscribed&#x27; =&gt; &#x27;谢谢，您已加入订阅列表。&#x27;],</div>
 <div class="add">+];</div></div></details>
-<details id="f-lang/zh/ui.php"><summary><span class="pill mod">modified</span><code>lang/zh/ui.php</code><span class="counts">+1 −1</span></summary><div class="diff"><div class="meta">diff --git a/lang/zh/ui.php b/lang/zh/ui.php</div>
-<div class="meta">index aad7bc3..aa7b958 100644</div>
+<details id="f-lang/zh/ui.php"><summary><span class="pill mod">modified</span><code>lang/zh/ui.php</code><span class="counts">+2 −1</span></summary><div class="diff"><div class="meta">diff --git a/lang/zh/ui.php b/lang/zh/ui.php</div>
+<div class="meta">index aad7bc3..525671a 100644</div>
 <div class="meta">--- a/lang/zh/ui.php</div>
 <div class="meta">+++ b/lang/zh/ui.php</div>
-<div class="hunk">@@ -40,5 +40,5 @@</div>
+<div class="hunk">@@ -25,6 +25,7 @@</div>
+<div class="ctx">         &#x27;views&#x27; =&gt; &#x27;浏览&#x27;,</div>
+<div class="ctx">         &#x27;palette&#x27; =&gt; &#x27;配色方案&#x27;, &#x27;palette_hint&#x27; =&gt; &#x27;此设计使用的主要墙面、木材与点缀色，便于匹配涂料和材料。&#x27;,</div>
+<div class="ctx">         &#x27;download_all&#x27; =&gt; &#x27;下载全部图片&#x27;, &#x27;download&#x27; =&gt; &#x27;下载&#x27;, &#x27;download_hint&#x27; =&gt; &#x27;高清 JPEG 打包为一个 zip 文件。&#x27;,</div>
+<div class="add">+        &#x27;download_preparing&#x27; =&gt; &#x27;正在打包…&#x27;, &#x27;download_progress&#x27; =&gt; &#x27;下载中… :percent%&#x27;, &#x27;download_done&#x27; =&gt; &#x27;压缩包已准备好。&#x27;, &#x27;download_failed&#x27; =&gt; &#x27;下载失败，请重试。&#x27;,</div>
+<div class="ctx">         &#x27;like&#x27; =&gt; &#x27;点赞&#x27;, &#x27;liked&#x27; =&gt; &#x27;已点赞&#x27;, &#x27;like_hint&#x27; =&gt; &#x27;点赞会影响热门排序。&#x27;,</div>
+<div class="ctx">         &#x27;floor&#x27; =&gt; &#x27;楼层&#x27;, &#x27;rooms&#x27; =&gt; &#x27;房间&#x27;,</div>
+<div class="ctx">         &#x27;tour&#x27; =&gt; &#x27;360°全景游览&#x27;, &#x27;tour_sub&#x27; =&gt; &#x27;逐层浏览。拖动环顾四周，切换房间，全屏观看。&#x27;, &#x27;rooms_360&#x27; =&gt; &#x27;:count 个 360° 房间&#x27;, &#x27;badge_360&#x27; =&gt; &#x27;360°&#x27;, &#x27;drag_hint&#x27; =&gt; &#x27;拖动环顾 · 滚轮或双指缩放&#x27;, &#x27;autorotate&#x27; =&gt; &#x27;自动旋转&#x27;, &#x27;reset_view&#x27; =&gt; &#x27;重置视角&#x27;, &#x27;fullscreen&#x27; =&gt; &#x27;全屏&#x27;, &#x27;loading&#x27; =&gt; &#x27;正在加载全景…&#x27;, &#x27;tour_locked&#x27; =&gt; &#x27;解锁此设计即可 360° 浏览每个房间。&#x27;, &#x27;webgl_missing&#x27; =&gt; &#x27;您的浏览器不支持 360° 显示，已改为显示平面全景图。&#x27;,</div>
+<div class="hunk">@@ -40,5 +41,5 @@</div>
 <div class="ctx">     &#x27;theme&#x27; =&gt; [&#x27;title&#x27; =&gt; &#x27;自定义外观&#x27;, &#x27;mode&#x27; =&gt; &#x27;模式&#x27;, &#x27;light&#x27; =&gt; &#x27;浅色&#x27;, &#x27;dark&#x27; =&gt; &#x27;深色&#x27;, &#x27;system&#x27; =&gt; &#x27;跟随系统&#x27;, &#x27;accent&#x27; =&gt; &#x27;强调色&#x27;, &#x27;text&#x27; =&gt; &#x27;文字颜色&#x27;, &#x27;bg&#x27; =&gt; &#x27;背景&#x27;, &#x27;font&#x27; =&gt; &#x27;标题字体&#x27;, &#x27;size&#x27; =&gt; &#x27;文字大小&#x27;, &#x27;radius&#x27; =&gt; &#x27;圆角&#x27;, &#x27;reset&#x27; =&gt; &#x27;恢复默认&#x27;],</div>
 <div class="ctx">     &#x27;checkout&#x27; =&gt; [&#x27;title&#x27; =&gt; &#x27;结算&#x27;, &#x27;unlock&#x27; =&gt; &#x27;解锁&#x27;, &#x27;pay&#x27; =&gt; &#x27;支付&#x27;, &#x27;already_owned&#x27; =&gt; &#x27;你已拥有此设计。&#x27;, &#x27;declined&#x27; =&gt; &#x27;支付被拒绝（演示）。&#x27;, &#x27;success_title&#x27; =&gt; &#x27;每个角度都属于你。&#x27;, &#x27;success_text&#x27; =&gt; &#x27;已加入你的工作室。随时打开完整图库。&#x27;],</div>
 <div class="ctx">     &#x27;footer&#x27; =&gt; [&#x27;explore&#x27; =&gt; &#x27;探索&#x27;, &#x27;company&#x27; =&gt; &#x27;工作室&#x27;, &#x27;contact&#x27; =&gt; &#x27;联系&#x27;],</div>
 <div class="del">-    &#x27;common&#x27; =&gt; [&#x27;save&#x27; =&gt; &#x27;保存&#x27;, &#x27;cancel&#x27; =&gt; &#x27;取消&#x27;, &#x27;back&#x27; =&gt; &#x27;返回&#x27;],</div>
 <div class="add">+    &#x27;common&#x27; =&gt; [&#x27;save&#x27; =&gt; &#x27;保存&#x27;, &#x27;cancel&#x27; =&gt; &#x27;取消&#x27;, &#x27;back&#x27; =&gt; &#x27;返回&#x27;, &#x27;loading&#x27; =&gt; &#x27;加载中&#x27;],</div>
 <div class="ctx"> ];</div></div></details>
-<details id="f-resources/js/app.js"><summary><span class="pill mod">modified</span><code>resources/js/app.js</code><span class="counts">+162 −2</span></summary><div class="diff"><div class="meta">diff --git a/resources/js/app.js b/resources/js/app.js</div>
-<div class="meta">index d2ff323..3a63a6b 100644</div>
+<details id="f-resources/js/app.js"><summary><span class="pill mod">modified</span><code>resources/js/app.js</code><span class="counts">+206 −2</span></summary><div class="diff"><div class="meta">diff --git a/resources/js/app.js b/resources/js/app.js</div>
+<div class="meta">index d2ff323..7a617f3 100644</div>
 <div class="meta">--- a/resources/js/app.js</div>
 <div class="meta">+++ b/resources/js/app.js</div>
 <div class="hunk">@@ -407,7 +407,11 @@ Alpine.data(&#x27;galleryManager&#x27;, (initial, angles, uploadUrl, floors = [&#x27;Ground flo</div>
@@ -1312,7 +1340,7 @@ bac5035 2026-10-09 11:16 ...
 <div class="ctx">     effectiveCover() { return this.cover || this.images.find((im) =&gt; im.kind !== &#x27;panorama&#x27;)?.url || this.images[0]?.url || &#x27;&#x27;; },</div>
 <div class="ctx">     };</div>
 <div class="ctx"> });</div>
-<div class="hunk">@@ -447,14 +451,170 @@ Alpine.data(&#x27;carousel&#x27;, (autoplayMs = 5000) =&gt; ({</div>
+<div class="hunk">@@ -447,14 +451,214 @@ Alpine.data(&#x27;carousel&#x27;, (autoplayMs = 5000) =&gt; ({</div>
 <div class="ctx"> }));</div>
 <div class="ctx"> </div>
 <div class="ctx"> /* ---------------- Toasts ---------------- */</div>
@@ -1423,6 +1451,50 @@ bac5035 2026-10-09 11:16 ...
 <div class="add">+        if (!ok) return;</div>
 <div class="add">+        Alpine.store(&#x27;loader&#x27;).show();</div>
 <div class="add">+        form.submit();</div>
+<div class="add">+    },</div>
+<div class="add">+}));</div>
+<div class="add">+</div>
+<div class="add">+/* ---------------- &quot;Download all images&quot;: fetch the zip with progress, then save it ---------------- */</div>
+<div class="add">+// A plain link gives no feedback while the server builds the zip, so the button fetches it itself:</div>
+<div class="add">+// spinner while the server prepares the file, a percentage while it streams, then the save dialog.</div>
+<div class="add">+Alpine.data(&#x27;downloadButton&#x27;, (url, filename, labels = {}) =&gt; ({</div>
+<div class="add">+    busy: false, percent: null,</div>
+<div class="add">+    get text() {</div>
+<div class="add">+        if (!this.busy) return labels.idle || &#x27;Download&#x27;;</div>
+<div class="add">+        return this.percent === null ? (labels.preparing || &#x27;Preparing…&#x27;) : (labels.progress || &#x27;Downloading… :percent%&#x27;).replace(&#x27;:percent&#x27;, this.percent);</div>
+<div class="add">+    },</div>
+<div class="add">+    async start() {</div>
+<div class="add">+        if (this.busy) return;</div>
+<div class="add">+        this.busy = true;</div>
+<div class="add">+        this.percent = null;</div>
+<div class="add">+        try {</div>
+<div class="add">+            const r = await fetch(url, { credentials: &#x27;same-origin&#x27;, headers: { Accept: &#x27;application/zip&#x27; } });</div>
+<div class="add">+            if (!r.ok) throw new Error(labels.failed || &#x27;The download failed.&#x27;);</div>
+<div class="add">+            const total = Number(r.headers.get(&#x27;Content-Length&#x27;)) || 0;</div>
+<div class="add">+            const reader = r.body.getReader();</div>
+<div class="add">+            const chunks = [];</div>
+<div class="add">+            let received = 0;</div>
+<div class="add">+            for (;;) {</div>
+<div class="add">+                const { done, value } = await reader.read();</div>
+<div class="add">+                if (done) break;</div>
+<div class="add">+                chunks.push(value);</div>
+<div class="add">+                received += value.length;</div>
+<div class="add">+                if (total) this.percent = Math.min(100, Math.round((received / total) * 100));</div>
+<div class="add">+            }</div>
+<div class="add">+            const name = (r.headers.get(&#x27;Content-Disposition&#x27;) || &#x27;&#x27;).match(/filename\*?=(?:UTF-8&#x27;&#x27;)?&quot;?([^&quot;;]+)&quot;?/)?.[1] || filename;</div>
+<div class="add">+            const href = URL.createObjectURL(new Blob(chunks, { type: &#x27;application/zip&#x27; }));</div>
+<div class="add">+            const a = Object.assign(document.createElement(&#x27;a&#x27;), { href, download: decodeURIComponent(name) });</div>
+<div class="add">+            document.body.appendChild(a);</div>
+<div class="add">+            a.click();</div>
+<div class="add">+            a.remove();</div>
+<div class="add">+            setTimeout(() =&gt; URL.revokeObjectURL(href), 60000);</div>
+<div class="add">+            window.dispatchEvent(new CustomEvent(&#x27;toast&#x27;, { detail: { message: labels.done || &#x27;Your zip is ready.&#x27;, type: &#x27;success&#x27; } }));</div>
+<div class="add">+        } catch (e) {</div>
+<div class="add">+            window.dispatchEvent(new CustomEvent(&#x27;toast&#x27;, { detail: { message: e.message || labels.failed, type: &#x27;error&#x27; } }));</div>
+<div class="add">+        } finally {</div>
+<div class="add">+            this.busy = false;</div>
+<div class="add">+            this.percent = null;</div>
+<div class="add">+        }</div>
 <div class="add">+    },</div>
 <div class="add">+}));</div>
 <div class="add">+</div>
@@ -2246,11 +2318,11 @@ bac5035 2026-10-09 11:16 ...
 <div class="add">+        &lt;/div&gt;</div>
 <div class="add">+    &lt;/div&gt;</div>
 <div class="add">+&lt;/div&gt;</div></div></details>
-<details id="f-resources/views/components/toggle.blade.php"><summary><span class="pill mod">modified</span><code>resources/views/components/toggle.blade.php</code><span class="counts">+7 −5</span></summary><div class="diff"><div class="meta">diff --git a/resources/views/components/toggle.blade.php b/resources/views/components/toggle.blade.php</div>
-<div class="meta">index 68ccfff..6f9301e 100644</div>
+<details id="f-resources/views/components/toggle.blade.php"><summary><span class="pill mod">modified</span><code>resources/views/components/toggle.blade.php</code><span class="counts">+10 −5</span></summary><div class="diff"><div class="meta">diff --git a/resources/views/components/toggle.blade.php b/resources/views/components/toggle.blade.php</div>
+<div class="meta">index 68ccfff..7c984a1 100644</div>
 <div class="meta">--- a/resources/views/components/toggle.blade.php</div>
 <div class="meta">+++ b/resources/views/components/toggle.blade.php</div>
-<div class="hunk">@@ -1,9 +1,11 @@</div>
+<div class="hunk">@@ -1,9 +1,14 @@</div>
 <div class="del">-@props([&#x27;name&#x27;, &#x27;checked&#x27; =&gt; false, &#x27;label&#x27; =&gt; null, &#x27;submit&#x27; =&gt; false])</div>
 <div class="add">+@props([&#x27;name&#x27;, &#x27;checked&#x27; =&gt; false, &#x27;label&#x27; =&gt; null, &#x27;submit&#x27; =&gt; false, &#x27;confirm&#x27; =&gt; null])</div>
 <div class="add">+{{-- `submit` sends the surrounding form on change; `confirm` names the item so a confirm dialog is shown first. --}}</div>
@@ -2261,23 +2333,25 @@ bac5035 2026-10-09 11:16 ...
 <div class="del">-        &lt;span class=&quot;absolute left-0.5 top-0.5 h-5 w-5 rounded-full bg-white shadow transition-all {{ $checked ? &#x27;translate-x-5&#x27; : &#x27;&#x27; }}&quot;&gt;&lt;/span&gt;</div>
 <div class="add">+    &lt;input type=&quot;checkbox&quot; name=&quot;{{ $name }}&quot; value=&quot;1&quot; class=&quot;peer sr-only&quot; @checked($checked)</div>
 <div class="add">+        @if($submit &amp;&amp; $confirm) onchange=&quot;confirmToggle(this, {{ Js::from($confirm) }})&quot; @elseif($submit) onchange=&quot;this.form.requestSubmit()&quot; @endif&gt;</div>
-<div class="add">+    {{-- The knob follows the checkbox state through CSS, so a cancelled confirm snaps it back. --}}</div>
-<div class="add">+    &lt;span class=&quot;relative inline-block h-6 w-11 rounded-full bg-line transition peer-checked:bg-accent peer-checked:[&amp;&gt;span]:translate-x-5 peer-focus-visible:ring-2 peer-focus-visible:ring-accent/40&quot;&gt;</div>
-<div class="add">+        &lt;span class=&quot;absolute left-0.5 top-0.5 h-5 w-5 rounded-full bg-white shadow transition-all&quot;&gt;&lt;/span&gt;</div>
+<div class="add">+    {{-- The knob follows the checkbox state through CSS, so a cancelled confirm snaps it back.</div>
+<div class="add">+         &quot;On&quot; is always green: the accent colour can be white, which would hide the white knob. --}}</div>
+<div class="add">+    &lt;span class=&quot;relative inline-block h-6 w-11 rounded-full bg-ink/20 transition peer-checked:bg-emerald-500 peer-checked:[&amp;&gt;span]:translate-x-5 peer-checked:[&amp;&gt;span&gt;svg]:opacity-100 peer-focus-visible:ring-2 peer-focus-visible:ring-emerald-500/40&quot;&gt;</div>
+<div class="add">+        &lt;span class=&quot;absolute left-0.5 top-0.5 flex h-5 w-5 items-center justify-center rounded-full bg-white text-emerald-600 shadow transition-all&quot;&gt;</div>
+<div class="add">+            &lt;svg class=&quot;h-3 w-3 opacity-0 transition&quot; viewBox=&quot;0 0 24 24&quot; fill=&quot;none&quot; stroke=&quot;currentColor&quot; stroke-width=&quot;3.5&quot; stroke-linecap=&quot;round&quot; stroke-linejoin=&quot;round&quot; aria-hidden=&quot;true&quot;&gt;&lt;path d=&quot;m5 12 5 5L20 7&quot;/&gt;&lt;/svg&gt;</div>
+<div class="add">+        &lt;/span&gt;</div>
 <div class="ctx">     &lt;/span&gt;</div>
 <div class="ctx">     @if($label)&lt;span class=&quot;text-ink-muted&quot;&gt;{{ $label }}&lt;/span&gt;@endif</div>
 <div class="ctx"> &lt;/label&gt;</div></div></details>
-<details id="f-resources/views/designs/show.blade.php"><summary><span class="pill mod">modified</span><code>resources/views/designs/show.blade.php</code><span class="counts">+2 −1</span></summary><div class="diff"><div class="meta">diff --git a/resources/views/designs/show.blade.php b/resources/views/designs/show.blade.php</div>
-<div class="meta">index 064c557..e6083ee 100644</div>
+<details id="f-resources/views/designs/show.blade.php"><summary><span class="pill mod">modified</span><code>resources/views/designs/show.blade.php</code><span class="counts">+1 −1</span></summary><div class="diff"><div class="meta">diff --git a/resources/views/designs/show.blade.php b/resources/views/designs/show.blade.php</div>
+<div class="meta">index 064c557..42dcf9b 100644</div>
 <div class="meta">--- a/resources/views/designs/show.blade.php</div>
 <div class="meta">+++ b/resources/views/designs/show.blade.php</div>
-<div class="hunk">@@ -65,7 +65,8 @@</div>
+<div class="hunk">@@ -65,7 +65,7 @@</div>
 <div class="ctx">                 &lt;div class=&quot;mt-6 space-y-2&quot;&gt;</div>
 <div class="ctx">                     @if($design-&gt;is_free || $unlocked)</div>
 <div class="ctx">                         &lt;a href=&quot;#gallery&quot; class=&quot;btn-primary w-full&quot;&gt;&lt;x-icon name=&quot;unlock&quot; /&gt; {{ $unlocked &amp;&amp; !$design-&gt;is_free ? __(&#x27;ui.design.owned&#x27;) : __(&#x27;ui.design.gallery&#x27;) }}&lt;/a&gt;</div>
 <div class="del">-                        &lt;a href=&quot;{{ route(&#x27;designs.download&#x27;, $design) }}&quot; class=&quot;btn-ghost w-full&quot;&gt;&lt;x-icon name=&quot;download&quot; size=&quot;15&quot; /&gt; {{ __(&#x27;ui.design.download_all&#x27;) }}&lt;/a&gt;</div>
-<div class="add">+                        {{-- A file download never loads a new page, so the page loader must not react to this link. --}}</div>
-<div class="add">+                        &lt;a href=&quot;{{ route(&#x27;designs.download&#x27;, $design) }}&quot; download data-no-loader class=&quot;btn-ghost w-full&quot;&gt;&lt;x-icon name=&quot;download&quot; size=&quot;15&quot; /&gt; {{ __(&#x27;ui.design.download_all&#x27;) }}&lt;/a&gt;</div>
+<div class="add">+                        &lt;x-download-button :design=&quot;$design&quot; /&gt;</div>
 <div class="ctx">                         &lt;p class=&quot;text-center text-xs text-ink-faint&quot;&gt;{{ __(&#x27;ui.design.download_hint&#x27;) }}&lt;/p&gt;</div>
 <div class="ctx">                     @elseif($buyForm)</div>
 <div class="ctx">                         &lt;form method=&quot;POST&quot; action=&quot;{{ $buyForm }}&quot;&gt;@csrf&lt;button class=&quot;btn-primary w-full&quot;&gt;&lt;x-icon name=&quot;lock&quot; /&gt; {{ __(&#x27;ui.design.unlock&#x27;) }}&lt;/button&gt;&lt;/form&gt;</div></div></details>
@@ -2428,17 +2502,16 @@ bac5035 2026-10-09 11:16 ...
 <div class="ctx">         &lt;/div&gt;</div>
 <div class="ctx">     &lt;/template&gt;</div>
 <div class="ctx"> &lt;/div&gt;</div></div></details>
-<details id="f-resources/views/themes/neon/designs/show.blade.php"><summary><span class="pill mod">modified</span><code>resources/views/themes/neon/designs/show.blade.php</code><span class="counts">+2 −1</span></summary><div class="diff"><div class="meta">diff --git a/resources/views/themes/neon/designs/show.blade.php b/resources/views/themes/neon/designs/show.blade.php</div>
-<div class="meta">index 35245f0..34c5542 100644</div>
+<details id="f-resources/views/themes/neon/designs/show.blade.php"><summary><span class="pill mod">modified</span><code>resources/views/themes/neon/designs/show.blade.php</code><span class="counts">+1 −1</span></summary><div class="diff"><div class="meta">diff --git a/resources/views/themes/neon/designs/show.blade.php b/resources/views/themes/neon/designs/show.blade.php</div>
+<div class="meta">index 35245f0..8146b51 100644</div>
 <div class="meta">--- a/resources/views/themes/neon/designs/show.blade.php</div>
 <div class="meta">+++ b/resources/views/themes/neon/designs/show.blade.php</div>
-<div class="hunk">@@ -66,7 +66,8 @@</div>
+<div class="hunk">@@ -66,7 +66,7 @@</div>
 <div class="ctx">                 &lt;div class=&quot;mt-5 flex flex-col gap-2&quot;&gt;</div>
 <div class="ctx">                     @if($canDownload)</div>
 <div class="ctx">                         &lt;a href=&quot;#gallery&quot; class=&quot;btn-primary w-full&quot;&gt;&lt;x-icon name=&quot;unlock&quot; size=&quot;15&quot; /&gt; {{ $unlocked &amp;&amp; !$design-&gt;is_free ? __(&#x27;ui.design.owned&#x27;) : __(&#x27;ui.design.gallery&#x27;) }}&lt;/a&gt;</div>
 <div class="del">-                        &lt;a href=&quot;{{ route(&#x27;designs.download&#x27;, $design) }}&quot; class=&quot;btn-ghost w-full&quot;&gt;&lt;x-icon name=&quot;download&quot; size=&quot;15&quot; /&gt; {{ __(&#x27;ui.design.download_all&#x27;) }}&lt;/a&gt;</div>
-<div class="add">+                        {{-- A file download never loads a new page, so the page loader must not react to this link. --}}</div>
-<div class="add">+                        &lt;a href=&quot;{{ route(&#x27;designs.download&#x27;, $design) }}&quot; download data-no-loader class=&quot;btn-ghost w-full&quot;&gt;&lt;x-icon name=&quot;download&quot; size=&quot;15&quot; /&gt; {{ __(&#x27;ui.design.download_all&#x27;) }}&lt;/a&gt;</div>
+<div class="add">+                        &lt;x-download-button :design=&quot;$design&quot; /&gt;</div>
 <div class="ctx">                     @elseif($buyForm)</div>
 <div class="ctx">                         &lt;form method=&quot;POST&quot; action=&quot;{{ $buyForm }}&quot;&gt;@csrf&lt;button class=&quot;btn-primary w-full&quot;&gt;&lt;x-icon name=&quot;lock&quot; size=&quot;15&quot; /&gt; {{ __(&#x27;ui.design.unlock&#x27;) }}&lt;/button&gt;&lt;/form&gt;</div>
 <div class="ctx">                     @else</div></div></details>
@@ -2861,11 +2934,20 @@ bac5035 2026-10-09 11:16 ...
 <div class="ctx">             -&gt;assertDontSee(&#x27;onchange=&amp;quot;&#x27;, false)</div>
 <div class="ctx">             -&gt;assertSee(route(&#x27;admin.categories.update&#x27;, &#x27;modern-hanok&#x27;), false);</div>
 <div class="ctx">         $this-&gt;actingAs($admin)-&gt;get(route(&#x27;admin.room-types.index&#x27;))</div></div></details>
-<details id="f-tests/Feature/PanoramaTourTest.php"><summary><span class="pill mod">modified</span><code>tests/Feature/PanoramaTourTest.php</code><span class="counts">+1 −1</span></summary><div class="diff"><div class="meta">diff --git a/tests/Feature/PanoramaTourTest.php b/tests/Feature/PanoramaTourTest.php</div>
-<div class="meta">index 94b115e..546d1a4 100644</div>
+<details id="f-tests/Feature/PanoramaTourTest.php"><summary><span class="pill mod">modified</span><code>tests/Feature/PanoramaTourTest.php</code><span class="counts">+3 −1</span></summary><div class="diff"><div class="meta">diff --git a/tests/Feature/PanoramaTourTest.php b/tests/Feature/PanoramaTourTest.php</div>
+<div class="meta">index 94b115e..1994f24 100644</div>
 <div class="meta">--- a/tests/Feature/PanoramaTourTest.php</div>
 <div class="meta">+++ b/tests/Feature/PanoramaTourTest.php</div>
-<div class="hunk">@@ -145,7 +145,7 @@ public function test_saving_warns_about_panoramas_that_are_not_two_to_one(): voi</div>
+<div class="hunk">@@ -84,6 +84,8 @@ public function test_gallery_lists_photos_only_in_both_themes(): void</div>
+<div class="ctx">         foreach ([&#x27;default&#x27;, &#x27;neon&#x27;] as $theme) {</div>
+<div class="ctx">             $this-&gt;get(route(&#x27;designs.show&#x27;, [&#x27;design&#x27; =&gt; $design, &#x27;theme&#x27; =&gt; $theme]))</div>
+<div class="ctx">                 -&gt;assertOk()</div>
+<div class="add">+                -&gt;assertSee(&#x27;downloadButton(&#x27;, false) // &quot;Download all images&quot; shows progress instead of the page loader</div>
+<div class="add">+                -&gt;assertSee(&#x27;Preparing your zip&#x27;, false)</div>
+<div class="ctx">                 -&gt;assertSee(&#x27;1/1&#x27;, false)</div>
+<div class="ctx">                 -&gt;assertDontSee(&#x27;1/3&#x27;, false)</div>
+<div class="ctx">                 -&gt;assertDontSee(&#x27;download=&quot;two-floor-house-2.jpg&quot;&#x27;, false);</div>
+<div class="hunk">@@ -145,7 +147,7 @@ public function test_saving_warns_about_panoramas_that_are_not_two_to_one(): voi</div>
 <div class="ctx">             $this-&gt;actingAs($this-&gt;admin())-&gt;put(route(&#x27;admin.designs.update&#x27;, $design), [</div>
 <div class="ctx">                 &#x27;title&#x27; =&gt; $design-&gt;title, &#x27;category_id&#x27; =&gt; $design-&gt;category_id, &#x27;room_type_id&#x27; =&gt; $design-&gt;room_type_id, &#x27;price&#x27; =&gt; 0, &#x27;published&#x27; =&gt; 1,</div>
 <div class="ctx">                 &#x27;images&#x27; =&gt; [[&#x27;url&#x27; =&gt; &#x27;http://localhost/images/library/phpunit-portrait.jpg&#x27;, &#x27;kind&#x27; =&gt; &#x27;panorama&#x27;, &#x27;floor&#x27; =&gt; 1, &#x27;title&#x27; =&gt; &#x27;Tall shot&#x27;]],</div>
@@ -2874,4 +2956,19 @@ bac5035 2026-10-09 11:16 ...
 <div class="ctx"> </div>
 <div class="ctx">             $this-&gt;assertSame(&#x27;/images/library/phpunit-portrait.jpg&#x27;, $design-&gt;fresh(&#x27;images&#x27;)-&gt;images-&gt;first()-&gt;url, &#x27;own-host URLs are stored site-relative&#x27;);</div>
 <div class="ctx">         } finally {</div></div></details>
+<details id="f-resources/views/components/download-button.blade.php"><summary><span class="pill add">added</span><code>resources/views/components/download-button.blade.php</code><span class="counts">+9 −0</span></summary><div class="diff"><div class="meta">diff --git a/resources/views/components/download-button.blade.php b/resources/views/components/download-button.blade.php</div>
+<div class="ctx">new file mode 100644</div>
+<div class="meta">index 0000000..19291c0</div>
+<div class="meta">--- /dev/null</div>
+<div class="meta">+++ b/resources/views/components/download-button.blade.php</div>
+<div class="hunk">@@ -0,0 +1,9 @@</div>
+<div class="add">+@props([&#x27;design&#x27;])</div>
+<div class="add">+{{-- &quot;Download all images&quot; with progress: the link still works without JavaScript. --}}</div>
+<div class="add">+&lt;a href=&quot;{{ route(&#x27;designs.download&#x27;, $design) }}&quot; download data-no-loader</div>
+<div class="add">+   x-data=&quot;downloadButton(@js(route(&#x27;designs.download&#x27;, $design)), @js($design-&gt;slug.&#x27;-images.zip&#x27;), @js([&#x27;idle&#x27; =&gt; __(&#x27;ui.design.download_all&#x27;), &#x27;preparing&#x27; =&gt; __(&#x27;ui.design.download_preparing&#x27;), &#x27;progress&#x27; =&gt; __(&#x27;ui.design.download_progress&#x27;), &#x27;done&#x27; =&gt; __(&#x27;ui.design.download_done&#x27;), &#x27;failed&#x27; =&gt; __(&#x27;ui.design.download_failed&#x27;)]))&quot;</div>
+<div class="add">+   @click.prevent=&quot;start()&quot; :aria-busy=&quot;busy&quot; :class=&quot;busy ? &#x27;pointer-events-none&#x27; : &#x27;&#x27;&quot; {{ $attributes-&gt;merge([&#x27;class&#x27; =&gt; &#x27;btn-ghost w-full&#x27;]) }}&gt;</div>
+<div class="add">+    &lt;span x-show=&quot;!busy&quot;&gt;&lt;x-icon name=&quot;download&quot; size=&quot;15&quot; /&gt;&lt;/span&gt;</div>
+<div class="add">+    &lt;svg x-cloak x-show=&quot;busy&quot; class=&quot;h-4 w-4 animate-spin&quot; viewBox=&quot;0 0 24 24&quot; fill=&quot;none&quot; aria-hidden=&quot;true&quot;&gt;&lt;circle cx=&quot;12&quot; cy=&quot;12&quot; r=&quot;10&quot; stroke=&quot;currentColor&quot; stroke-opacity=&quot;.25&quot; stroke-width=&quot;3&quot;/&gt;&lt;path d=&quot;M22 12a10 10 0 0 0-10-10&quot; stroke=&quot;currentColor&quot; stroke-width=&quot;3&quot; stroke-linecap=&quot;round&quot;/&gt;&lt;/svg&gt;</div>
+<div class="add">+    &lt;span x-text=&quot;text&quot;&gt;{{ __(&#x27;ui.design.download_all&#x27;) }}&lt;/span&gt;</div>
+<div class="add">+&lt;/a&gt;</div></div></details>
 </main></body></html>
