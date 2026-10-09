@@ -11,6 +11,7 @@ use App\Models\Setting;
 use App\Models\User;
 use App\Support\LocalImage;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Tests\TestCase;
 
@@ -47,6 +48,23 @@ class AdminImprovementsTest extends TestCase
         ])->assertRedirect();
         $this->assertNotSame('', $design->fresh()->slug, 'saving from the admin never leaves the slug empty');
         $this->get(route('designs.show', $design->fresh()))->assertOk();
+    }
+
+    public function test_similar_designs_query_uses_only_portable_sql(): void
+    {
+        $design = $this->design('Tatami Rest');
+        $design->update(['tags' => ['tatami', 'shoji']]);
+        $other = $this->design('Other');
+        $other->update(['tags' => ['tatami'], 'trending_score' => 9000]);
+
+        DB::enableQueryLog();
+        $similar = $design->similar(6);
+        $sql = collect(DB::getQueryLog())->pluck('query')->first(fn (string $q) => str_contains($q, 'sim_score'));
+
+        $this->assertSame([$other->id], $similar->pluck('id')->all());
+        // MySQL/MariaDB only know MIN() as an aggregate; the cap must be a CASE expression.
+        $this->assertStringNotContainsString('MIN(', $sql);
+        $this->assertStringContainsString('CASE WHEN trending_score / 200.0 > 20 THEN 20', $sql);
     }
 
     public function test_removing_the_cover_image_from_the_gallery_falls_back_to_the_first_photo(): void

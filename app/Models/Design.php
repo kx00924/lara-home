@@ -191,7 +191,9 @@ class Design extends Model
             $score .= ' + (CASE WHEN tags LIKE ? THEN 8 ELSE 0 END)';
             $bindings[] = '%"'.$tag.'"%';
         }
-        $score .= ' + MIN(trending_score / 200.0, 20)';
+        // Capped trending bonus. Written as CASE rather than MIN(a, b): SQLite accepts a two-argument
+        // MIN, but MySQL/MariaDB only know MIN as an aggregate (theirs is LEAST), and this must run on both.
+        $score .= ' + (CASE WHEN trending_score / 200.0 > 20 THEN 20 ELSE trending_score / 200.0 END)';
 
         return $query->selectRaw('designs.*, ('.$score.') as sim_score', $bindings)
             ->orderByDesc('sim_score')
