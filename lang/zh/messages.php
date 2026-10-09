@@ -25,6 +25,7 @@ return [
         'room_has_designs' => '此空间类型下仍有设计，请先移动它们。',
 
         'order_marked' => '订单已标记为 :status。',
+        'order_deleted' => '订单已删除。',
         'customer_updated' => '客户已更新。',
         'customer_deleted' => '客户已删除。',
         'own_account_change' => '不能修改自己的角色或状态。',
@@ -35,7 +36,7 @@ return [
         'bulk_designs_kept' => '其中 :count 个有已付款订单，已保留；请改为取消发布。',
         'bulk_taxonomy_kept' => '其中 :count 个仍有设计，已保留。',
         'bulk_self_skipped' => '已跳过您自己的账户。',
-        'nouns' => ['designs' => '设计', 'styles' => '风格', 'rooms' => '空间类型', 'accounts' => '账户'],
+        'nouns' => ['designs' => '设计', 'styles' => '风格', 'rooms' => '空间类型', 'orders' => '订单', 'accounts' => '账户'],
         'actions' => [
             'publish' => '发布', 'unpublish' => '取消发布', 'feature' => '设为精选', 'unfeature' => '取消精选',
             'delete' => '删除', 'activate' => '启用', 'deactivate' => '停用',

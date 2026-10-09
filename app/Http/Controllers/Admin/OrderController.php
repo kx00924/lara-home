@@ -37,18 +37,39 @@ class OrderController extends Controller
         return back()->with('success', __('messages.admin.order_marked', ['status' => $data['status']]));
     }
 
-    /** Changes the status of many orders at once. */
+    public function destroy(Order $order)
+    {
+        $this->deleteOrder($order);
+
+        return back()->with('success', __('messages.admin.order_deleted'));
+    }
+
+    /** Changes the status of many orders at once, or deletes them. */
     public function bulk(Request $request)
     {
         $data = $request->validate([
-            'action' => ['required', 'in:'.implode(',', Order::STATUSES)],
+            'action' => ['required', 'in:delete,'.implode(',', Order::STATUSES)],
             'ids' => ['required', 'array', 'max:500'],
             'ids.*' => ['integer'],
         ]);
         $orders = Order::whereIn('id', $data['ids'])->get();
+        if ($data['action'] === 'delete') {
+            $orders->each(fn (Order $order) => $this->deleteOrder($order));
+
+            return back()->with('success', __('messages.admin.bulk_done', ['count' => $orders->count(), 'items' => __('messages.admin.nouns.orders'), 'action' => __('messages.admin.actions.delete')]));
+        }
         $orders->each(fn (Order $order) => $this->setStatus($order, $data['action']));
 
         return back()->with('success', __('messages.admin.bulk_orders', ['count' => $orders->count(), 'status' => $data['action']]));
+    }
+
+    /** Deleting a paid order also takes the sale off the design's purchase count. */
+    private function deleteOrder(Order $order): void
+    {
+        if ($order->status === 'paid') {
+            $order->design()->decrement('purchases');
+        }
+        $order->delete();
     }
 
     /** Moves an order to a status, keeping the design's purchase count in step. */

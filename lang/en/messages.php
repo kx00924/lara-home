@@ -26,6 +26,7 @@ return [
         'room_has_designs' => 'This room type still has designs. Move them first.',
 
         'order_marked' => 'Order marked :status.',
+        'order_deleted' => 'Order deleted.',
         'customer_updated' => 'Customer updated.',
         'customer_deleted' => 'Customer deleted.',
         'own_account_change' => 'You cannot change your own role or status.',
@@ -37,7 +38,7 @@ return [
         'bulk_designs_kept' => ' :count with paid orders were kept; unpublish those instead.',
         'bulk_taxonomy_kept' => ' :count still have designs and were kept.',
         'bulk_self_skipped' => ' Your own account was skipped.',
-        'nouns' => ['designs' => 'design(s)', 'styles' => 'style(s)', 'rooms' => 'room type(s)', 'accounts' => 'account(s)'],
+        'nouns' => ['designs' => 'design(s)', 'styles' => 'style(s)', 'rooms' => 'room type(s)', 'orders' => 'order(s)', 'accounts' => 'account(s)'],
         'actions' => [
             'publish' => 'published', 'unpublish' => 'unpublished', 'feature' => 'featured', 'unfeature' => 'unfeatured',
             'delete' => 'deleted', 'activate' => 'activated', 'deactivate' => 'deactivated',

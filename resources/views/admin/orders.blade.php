@@ -28,6 +28,7 @@
                     <x-admin.sort-th key="provider" label="Provider" :sort="$sort" :dir="$dir" />
                     <x-admin.sort-th key="status" label="Status" :sort="$sort" :dir="$dir" />
                     <x-admin.sort-th key="created_at" label="Date" :sort="$sort" :dir="$dir" />
+                    <th></th>
                 </tr></thead>
                 <tbody>
                     @foreach($orders as $o)
@@ -48,6 +49,7 @@
                                 </form>
                             </td>
                             <td class="text-xs text-ink-muted">{{ ($o->paid_at ?? $o->created_at)->format('M j, Y') }}</td>
+                            <td class="text-right"><x-delete-form :action="route('admin.orders.destroy', $o)" :item="'order #'.$o->id" :message="$o->status === 'paid' ? 'This is a paid order: the customer loses access to the design and the sale is removed from the stats. This cannot be undone.' : 'This cannot be undone.'" /></td>
                         </tr>
                     @endforeach
                 </tbody>
@@ -56,7 +58,7 @@
             <p class="py-14 text-center text-sm text-ink-muted">No orders match.</p>
         @endif
     </div>
-    @include('admin.partials.bulk-bar', ['action' => route('admin.orders.bulk'), 'actions' => ['paid' => 'Mark paid', 'pending' => 'Mark pending', 'failed' => 'Mark failed', 'refunded' => 'Mark refunded']])
+    @include('admin.partials.bulk-bar', ['action' => route('admin.orders.bulk'), 'actions' => ['paid' => 'Mark paid', 'pending' => 'Mark pending', 'failed' => 'Mark failed', 'refunded' => 'Mark refunded', 'delete' => 'Delete']])
     {{ $orders->links() }}
 </div>
 @endsection

@@ -151,7 +151,7 @@ theme previews and activation, the admin Themes page and the seeder.
 - Every table has search, sortable columns (click a header), a page-size selector
   (10 / 20 / 50 / 100), pagination, numbering and row checkboxes with a bulk-action
   bar (publish / unpublish / feature / delete designs, activate / deactivate / delete
-  styles and rooms, change order status, change customer role / status / delete).
+  styles and rooms, change order status or delete orders, change customer role / status / delete).
 - Active, published, status and role changes ask for confirmation first; thumbnails open
   a full-size viewer; every page change shows a loading overlay.
 - Designs: create/edit, publish/feature toggles, price (0 = free), delete.

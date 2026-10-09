@@ -73,6 +73,15 @@ class AdminBulkActionsTest extends TestCase
         $this->actingAs($admin)->post(route('admin.orders.bulk'), ['action' => 'refunded', 'ids' => [$order->id]])->assertRedirect();
         $this->assertSame(0, $design->fresh()->purchases, 'leaving paid decrements the purchase count');
 
+        // Orders can be deleted one by one or in bulk; deleting a paid one takes the sale off the design.
+        $paid = Order::create(['user_id' => $customer->id, 'design_id' => $design->id, 'amount' => 20, 'currency' => 'USD', 'status' => 'paid', 'provider' => 'demo', 'paid_at' => now()]);
+        $design->increment('purchases');
+        $this->actingAs($admin)->delete(route('admin.orders.destroy', $paid))->assertRedirect()->assertSessionHas('success', 'Order deleted.');
+        $this->assertNull(Order::find($paid->id));
+        $this->assertSame(0, $design->fresh()->purchases);
+        $this->actingAs($admin)->post(route('admin.orders.bulk'), ['action' => 'delete', 'ids' => [$order->id]])->assertSessionHas('success', '1 order(s) deleted.');
+        $this->assertNull(Order::find($order->id));
+
         $this->actingAs($admin)->post(route('admin.users.bulk'), ['action' => 'deactivate', 'ids' => [$customer->id, $admin->id]])
             ->assertSessionHas('warning', fn (string $m) => str_contains($m, 'Your own account was skipped'));
         $this->assertFalse($customer->fresh()->is_active);

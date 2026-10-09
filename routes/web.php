@@ -63,6 +63,7 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(fun
     Route::resource('room-types', Admin\RoomTypeController::class)->except(['show', 'create', 'edit'])->parameters(['room-types' => 'roomType']);
     Route::get('/orders', [Admin\OrderController::class, 'index'])->name('orders.index');
     Route::patch('/orders/{order}', [Admin\OrderController::class, 'update'])->name('orders.update');
+    Route::delete('/orders/{order}', [Admin\OrderController::class, 'destroy'])->name('orders.destroy');
     Route::get('/users', [Admin\UserController::class, 'index'])->name('users.index');
     Route::patch('/users/{user}', [Admin\UserController::class, 'update'])->name('users.update');
     Route::delete('/users/{user}', [Admin\UserController::class, 'destroy'])->name('users.destroy');
